@@ -18,7 +18,7 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
   
   const { 
     cycleDays, 
-    cycles, 
+    cycles = [], 
     currentCycleId, 
     addCycleDay, 
     updateCycleDay, 
@@ -156,7 +156,7 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     let day = startDate;
     
     // Find current cycle
-    const currentCycle = cycles.find(cycle => cycle.id === currentCycleId);
+    const currentCycle = currentCycleId ? cycles.find(cycle => cycle.id === currentCycleId) : undefined;
     
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {

@@ -1,81 +1,74 @@
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Calendar } from '@/components/ui/calendar';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Slider } from '@/components/ui/slider';
-import { useToast } from '@/hooks/use-toast';
 import { useAppStore } from '@/lib/store';
 import { FlowLevel, Mood, Symptom } from '@/types';
 import Layout from '@/components/layout/Layout';
-import { format } from 'date-fns';
-import { DropletIcon, ThermometerIcon, SmileIcon, Activity } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 
 const Track: React.FC = () => {
-  const { toast } = useToast();
-  const [date, setDate] = useState<Date>(new Date());
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("flow");
-  const [selectedFlow, setSelectedFlow] = useState<FlowLevel | undefined>(undefined);
-  const [selectedMood, setSelectedMood] = useState<Mood | undefined>(undefined);
-  const [selectedSymptoms, setSelectedSymptoms] = useState<Symptom[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [flowLevel, setFlowLevel] = useState<FlowLevel | undefined>(undefined);
+  const [mood, setMood] = useState<Mood | undefined>(undefined);
+  const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [temperature, setTemperature] = useState<number | undefined>(undefined);
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState<string>('');
   
   const { addCycleDay, cycleDays } = useAppStore();
-  const navigate = useNavigate();
+  const { toast } = useToast();
   
-  const existingData = cycleDays.find(
-    day => format(day.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
-  );
+  const handleFlowSelect = (flow: FlowLevel) => {
+    setFlowLevel(flowLevel === flow ? undefined : flow);
+  };
   
-  const handleDateSelect = (date: Date | undefined) => {
-    if (date) {
-      setDate(date);
-      if (existingData) {
-        setSelectedFlow(existingData.flow);
-        setSelectedMood(existingData.mood);
-        setSelectedSymptoms(existingData.symptoms);
-        setTemperature(existingData.baselTemperature);
-        setNotes(existingData.notes || "");
-      } else {
-        setSelectedFlow(undefined);
-        setSelectedMood(undefined);
-        setSelectedSymptoms([]);
-        setTemperature(undefined);
-        setNotes("");
-      }
-      setIsDialogOpen(true);
+  const handleMoodSelect = (selectedMood: Mood) => {
+    setMood(mood === selectedMood ? undefined : selectedMood);
+  };
+  
+  const handleSymptomToggle = (symptom: Symptom) => {
+    if (symptoms.includes(symptom)) {
+      setSymptoms(symptoms.filter(s => s !== symptom));
+    } else {
+      setSymptoms([...symptoms, symptom]);
     }
   };
   
-  const handleSave = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Check if we have at least one piece of data
+    if (!flowLevel && !mood && symptoms.length === 0 && !temperature && !notes) {
+      toast({
+        title: "Error",
+        description: "Please add at least one type of data to track.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Add the cycle day data
     addCycleDay({
-      date,
-      flow: selectedFlow,
-      mood: selectedMood,
-      symptoms: selectedSymptoms,
+      date: selectedDate,
+      flow: flowLevel,
+      mood: mood,
+      symptoms: symptoms,
       baselTemperature: temperature,
-      notes
+      notes: notes,
     });
     
     toast({
-      title: "Tracking data saved",
-      description: `Data for ${format(date, 'MMMM dd, yyyy')} has been saved.`
+      title: "Success",
+      description: "Your data has been saved.",
     });
     
-    setIsDialogOpen(false);
-    navigate('/calendar');
-  };
-  
-  const toggleSymptom = (symptom: Symptom) => {
-    if (selectedSymptoms.includes(symptom)) {
-      setSelectedSymptoms(selectedSymptoms.filter(s => s !== symptom));
-    } else {
-      setSelectedSymptoms([...selectedSymptoms, symptom]);
-    }
+    // Reset form
+    setFlowLevel(undefined);
+    setMood(undefined);
+    setSymptoms([]);
+    setTemperature(undefined);
+    setNotes('');
   };
   
   return (
@@ -83,216 +76,175 @@ const Track: React.FC = () => {
       <div className="container mx-auto py-6 px-4">
         <h1 className="text-2xl font-bold text-cycle-primary mb-6">Track Your Cycle</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="md:col-span-2">
             <CardHeader>
-              <CardTitle>Select a Date</CardTitle>
-              <CardDescription>Choose a date to log cycle information</CardDescription>
+              <CardTitle>Today's Entry</CardTitle>
+              <CardDescription>
+                Log how you're feeling today
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={handleDateSelect}
-                className="rounded-md border p-3 pointer-events-auto"
-              />
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Flow Tracking */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Period Flow</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    {Object.values(FlowLevel).map(flow => (
+                      <button
+                        key={flow}
+                        type="button"
+                        className={`py-2 px-4 rounded-lg text-sm ${
+                          flowLevel === flow 
+                            ? 'bg-phase-menstrual text-white' 
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                        }`}
+                        onClick={() => handleFlowSelect(flow)}
+                      >
+                        {flow.replace('_', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Mood Tracking */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Mood</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {Object.values(Mood).map(moodOption => (
+                      <button
+                        key={moodOption}
+                        type="button"
+                        className={`py-2 px-4 rounded-lg text-sm ${
+                          mood === moodOption 
+                            ? 'bg-symptom-mood text-white' 
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                        }`}
+                        onClick={() => handleMoodSelect(moodOption)}
+                      >
+                        {moodOption}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Symptoms */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Symptoms</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {Object.values(Symptom).map(symptom => (
+                      <button
+                        key={symptom}
+                        type="button"
+                        className={`py-2 px-4 rounded-lg text-sm text-left ${
+                          symptoms.includes(symptom) 
+                            ? 'bg-symptom-secondary text-white' 
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                        }`}
+                        onClick={() => handleSymptomToggle(symptom)}
+                      >
+                        {symptom.replace('_', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Temperature */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Basal Temperature (°C)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="35"
+                    max="42"
+                    className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-md"
+                    value={temperature || ''}
+                    onChange={(e) => setTemperature(e.target.value ? parseFloat(e.target.value) : undefined)}
+                  />
+                </div>
+                
+                {/* Notes */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                  <textarea
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md h-24"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Add any additional notes about your day..."
+                  />
+                </div>
+                
+                <Button type="submit" className="w-full">
+                  Save Entry
+                </Button>
+              </form>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader>
-              <CardTitle>Quick Add</CardTitle>
-              <CardDescription>Quickly log your period for today</CardDescription>
+              <CardTitle>Select Date</CardTitle>
+              <CardDescription>
+                Choose a date for this entry
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <p className="text-sm text-gray-600">Select your flow level for today:</p>
-                
-                <div className="flex flex-wrap gap-2">
-                  {Object.values(FlowLevel).map((flow) => (
-                    <Button
-                      key={flow}
-                      variant="outline"
-                      className={`flex items-center gap-2 ${
-                        selectedFlow === flow 
-                          ? 'bg-cycle-primary text-white' 
-                          : 'hover:bg-cycle-primary/10'
-                      }`}
-                      onClick={() => setSelectedFlow(flow)}
-                    >
-                      <DropletIcon size={16} />
-                      <span className="capitalize">{flow.replace('_', ' ')}</span>
-                    </Button>
-                  ))}
-                </div>
-                
-                <Button
-                  className="w-full mt-4 bg-cycle-primary hover:bg-cycle-secondary"
-                  onClick={() => {
-                    if (selectedFlow) {
-                      addCycleDay({
-                        date: new Date(),
-                        flow: selectedFlow,
-                        symptoms: []
-                      });
-                      
-                      toast({
-                        title: "Period logged",
-                        description: "Your period has been logged for today."
-                      });
-                      
-                      navigate('/calendar');
-                    } else {
-                      toast({
-                        title: "Flow level required",
-                        description: "Please select a flow level.",
-                        variant: "destructive"
-                      });
-                    }
-                  }}
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => date && setSelectedDate(date)}
+                className="rounded-md border"
+              />
+              
+              <div className="mt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSelectedDate(new Date())}
+                  className="w-full"
                 >
-                  Save for Today
+                  Reset to Today
                 </Button>
+              </div>
+              
+              <div className="mt-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Quick Add</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      addCycleDay({
+                        date: selectedDate,
+                        flow: FlowLevel.MEDIUM,
+                        symptoms: [],
+                      });
+                      toast({
+                        title: "Flow added",
+                        description: "Medium flow added for the selected date.",
+                      });
+                    }}
+                  >
+                    Add Flow
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedDate(new Date());
+                      setFlowLevel(undefined);
+                      setMood(undefined);
+                      setSymptoms([]);
+                      setTemperature(undefined);
+                      setNotes('');
+                    }}
+                  >
+                    Clear Form
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
-        
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-md mx-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {format(date, 'MMMM dd, yyyy')}
-              </DialogTitle>
-            </DialogHeader>
-            
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-4">
-                <TabsTrigger value="flow">Flow</TabsTrigger>
-                <TabsTrigger value="symptoms">Symptoms</TabsTrigger>
-                <TabsTrigger value="mood">Mood</TabsTrigger>
-                <TabsTrigger value="more">More</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="flow" className="space-y-4 mt-4">
-                <h3 className="font-medium flex items-center gap-2">
-                  <DropletIcon size={18} className="text-cycle-primary" />
-                  Flow Level
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.values(FlowLevel).map((flow) => (
-                    <Button
-                      key={flow}
-                      variant="outline"
-                      className={`flex items-center justify-center gap-2 ${
-                        selectedFlow === flow 
-                          ? 'bg-cycle-primary text-white' 
-                          : 'hover:bg-cycle-primary/10'
-                      }`}
-                      onClick={() => setSelectedFlow(flow)}
-                    >
-                      <span className="capitalize">{flow.replace('_', ' ')}</span>
-                    </Button>
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="symptoms" className="space-y-4 mt-4">
-                <h3 className="font-medium flex items-center gap-2">
-                  <Activity size={18} className="text-cycle-primary" />
-                  Symptoms
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.values(Symptom).slice(0, 10).map((symptom) => (
-                    <Button
-                      key={symptom}
-                      variant="outline"
-                      className={`flex items-center justify-start gap-2 ${
-                        selectedSymptoms.includes(symptom) 
-                          ? 'bg-cycle-primary text-white' 
-                          : 'hover:bg-cycle-primary/10'
-                      }`}
-                      onClick={() => toggleSymptom(symptom)}
-                    >
-                      <span className="capitalize">{symptom.replace('_', ' ')}</span>
-                    </Button>
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="mood" className="space-y-4 mt-4">
-                <h3 className="font-medium flex items-center gap-2">
-                  <SmileIcon size={18} className="text-cycle-primary" />
-                  Mood
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.values(Mood).map((mood) => (
-                    <Button
-                      key={mood}
-                      variant="outline"
-                      className={`flex items-center justify-center gap-2 ${
-                        selectedMood === mood 
-                          ? 'bg-cycle-primary text-white' 
-                          : 'hover:bg-cycle-primary/10'
-                      }`}
-                      onClick={() => setSelectedMood(mood)}
-                    >
-                      <span className="capitalize">{mood}</span>
-                    </Button>
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="more" className="space-y-4 mt-4">
-                <div className="space-y-4">
-                  <h3 className="font-medium flex items-center gap-2">
-                    <ThermometerIcon size={18} className="text-cycle-primary" />
-                    Basal Body Temperature
-                  </h3>
-                  <div className="px-2">
-                    <Slider
-                      defaultValue={temperature ? [temperature] : [36.5]}
-                      min={35.5}
-                      max={38.0}
-                      step={0.1}
-                      onValueChange={(value) => setTemperature(value[0])}
-                    />
-                    <div className="flex justify-between mt-2">
-                      <span className="text-sm text-gray-500">35.5°C</span>
-                      <span className="text-sm font-medium">
-                        {temperature ? temperature.toFixed(1) : "36.5"}°C
-                      </span>
-                      <span className="text-sm text-gray-500">38.0°C</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <h3 className="font-medium">Notes</h3>
-                    <textarea
-                      className="w-full p-2 border rounded-md"
-                      rows={3}
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Add notes about how you're feeling..."
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-            
-            <div className="flex justify-end gap-2 mt-4">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button 
-                className="bg-cycle-primary hover:bg-cycle-secondary"
-                onClick={handleSave}
-              >
-                Save
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </Layout>
   );

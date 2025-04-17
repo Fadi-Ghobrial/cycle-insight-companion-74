@@ -28,20 +28,20 @@ export const AppAuthProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isLoading, setIsLoading] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const { login: storeLogin, logout: storeLogout } = useAppStore();
+  const appStore = useAppStore();
   
   // Mock login function for development
   const login = (userData: User) => {
     setUser(userData);
     setIsSignedIn(true);
-    storeLogin(userData);
+    appStore.login(userData);
   };
   
   // Mock logout function for development
   const logout = () => {
     setUser(null);
     setIsSignedIn(false);
-    storeLogout();
+    appStore.logout();
   };
   
   // For development, auto-login with a test user
