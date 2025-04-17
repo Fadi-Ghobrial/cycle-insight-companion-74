@@ -1,11 +1,17 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import Track from "./pages/Track";
+import Calendar from "./pages/Calendar";
+import Insights from "./pages/Insights";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
+import Layout from "./components/layout/Layout";
 
 // Initialize store
 import { useAppStore } from "./lib/store";
@@ -25,10 +31,10 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/index" element={<Index />} />
-            <Route path="/calendar" element={<div className="min-h-screen bg-gray-50 p-4">Calendar Page (Coming Soon)</div>} />
-            <Route path="/track" element={<div className="min-h-screen bg-gray-50 p-4">Track Page (Coming Soon)</div>} />
-            <Route path="/insights" element={<div className="min-h-screen bg-gray-50 p-4">Insights Page (Coming Soon)</div>} />
-            <Route path="/settings" element={<div className="min-h-screen bg-gray-50 p-4">Settings Page (Coming Soon)</div>} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/track" element={<Track />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
