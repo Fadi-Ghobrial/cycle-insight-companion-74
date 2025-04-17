@@ -16,7 +16,7 @@ const Track: React.FC = () => {
   const [temperature, setTemperature] = useState<number | undefined>(undefined);
   const [notes, setNotes] = useState<string>('');
   
-  const { addCycleDay, cycleDays } = useAppStore();
+  const { addCycleDay, cycleDays, user } = useAppStore();
   const { toast } = useToast();
   
   const handleFlowSelect = (flow: FlowLevel) => {
@@ -56,6 +56,7 @@ const Track: React.FC = () => {
       symptoms: symptoms,
       baselTemperature: temperature,
       notes: notes,
+      userId: user?.id || 'guest'
     });
     
     toast({
@@ -72,7 +73,7 @@ const Track: React.FC = () => {
   };
   
   return (
-    <Layout>
+    <Layout requireAuth={true}>
       <div className="container mx-auto py-6 px-4">
         <h1 className="text-2xl font-bold text-cycle-primary mb-6">Track Your Cycle</h1>
         
@@ -218,6 +219,7 @@ const Track: React.FC = () => {
                         date: selectedDate,
                         flow: FlowLevel.MEDIUM,
                         symptoms: [],
+                        userId: user?.id || 'guest'
                       });
                       toast({
                         title: "Flow added",

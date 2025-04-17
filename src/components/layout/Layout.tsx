@@ -7,14 +7,15 @@ import { RequireAuth } from '@/lib/auth-provider';
 
 interface LayoutProps {
   requireAuth?: boolean;
+  children?: React.ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({ requireAuth = true }) => {
+const Layout: React.FC<LayoutProps> = ({ requireAuth = true, children }) => {
   const content = (
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-grow">
-        <Outlet />
+        {children || <Outlet />}
       </main>
       <Footer />
     </div>

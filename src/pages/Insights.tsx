@@ -1,11 +1,15 @@
+
 import React, { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PieChart, Pie, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { useAppStore } from '@/lib/store';
 import { format, differenceInDays } from 'date-fns';
-import { Symptom } from '@/types';
+import { Symptom, CyclePhase } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Droplet, Calendar, Activity, Thermometer, BarChart2 } from 'lucide-react';
 
 const formatSymptomName = (name: string | number): string => {
   if (typeof name === 'string') {
@@ -141,7 +145,7 @@ const Insights: React.FC = () => {
   const COLORS = ['#8884d8', '#83a6ed', '#8dd1e1', '#82ca9d', '#a4de6c', '#d0ed57'];
   
   return (
-    <Layout>
+    <Layout requireAuth={true}>
       <div className="container mx-auto py-6 px-4">
         <h1 className="text-2xl font-bold text-cycle-primary mb-6">Cycle Insights</h1>
         
@@ -157,7 +161,7 @@ const Insights: React.FC = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <DropletIcon className="text-pink-500" size={18} />
+                    <Droplet className="text-pink-500" size={18} />
                     Cycle Length
                   </CardTitle>
                 </CardHeader>
@@ -172,7 +176,7 @@ const Insights: React.FC = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <CalendarIcon className="text-pink-500" size={18} />
+                    <Calendar className="text-pink-500" size={18} />
                     Period Length
                   </CardTitle>
                 </CardHeader>
@@ -187,7 +191,7 @@ const Insights: React.FC = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <CalendarIcon className="text-cycle-primary" size={18} />
+                    <Calendar className="text-cycle-primary" size={18} />
                     Next Period
                   </CardTitle>
                 </CardHeader>
@@ -208,7 +212,7 @@ const Insights: React.FC = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <ActivityIcon className="text-cycle-primary" size={18} />
+                    <Activity className="text-cycle-primary" size={18} />
                     Tracking
                   </CardTitle>
                 </CardHeader>
@@ -228,7 +232,7 @@ const Insights: React.FC = () => {
                   <CardDescription>Your most frequent symptoms</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {stats.mostCommonSymptoms.length > 0 ? (
+                  {stats.mostCommonSymptoms && stats.mostCommonSymptoms.length > 0 ? (
                     <div className="space-y-3">
                       {stats.mostCommonSymptoms.map(({ symptom, count }) => (
                         <div key={symptom} className="flex justify-between items-center">
@@ -329,7 +333,7 @@ const Insights: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <ThermometerIcon className="text-red-500" size={18} />
+                  <Thermometer className="text-red-500" size={18} />
                   Temperature Chart
                 </CardTitle>
                 <CardDescription>Your basal body temperature over time</CardDescription>
@@ -361,7 +365,7 @@ const Insights: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="text-cycle-primary" size={18} />
+                  <BarChart2 className="text-cycle-primary" size={18} />
                   Symptom Distribution
                 </CardTitle>
                 <CardDescription>Frequency of recorded symptoms</CardDescription>

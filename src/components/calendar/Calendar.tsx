@@ -25,7 +25,8 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     deleteCycleDay,
     recalculatePredictions,
     undo,
-    reset
+    reset,
+    user
   } = useAppStore();
   
   const nextMonth = () => {
@@ -62,6 +63,7 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
         flow: data.flow,
         symptoms: data.symptoms || [],
         notes: data.notes || '',
+        userId: user?.id || 'guest'
       });
     }
     
@@ -156,7 +158,7 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     let day = startDate;
     
     // Find current cycle
-    const currentCycle = currentCycleId ? cycles.find(cycle => cycle.id === currentCycleId) : undefined;
+    const currentCycle = cycles && currentCycleId ? cycles.find(cycle => cycle.id === currentCycleId) : undefined;
     
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
@@ -167,7 +169,7 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
         
         // Determine phase from predictions
         let phase: CyclePhase | undefined;
-        if (currentCycle?.predictions) {
+        if (currentCycle?.predictions?.phases) {
           // Check each phase to see if this day falls within it
           for (const phasePrediction of currentCycle.predictions.phases) {
             const phaseStart = new Date(phasePrediction.startDate);

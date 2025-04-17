@@ -9,7 +9,7 @@ const Home: React.FC = () => {
   const { cycleDays, isAuthenticated } = useAppStore();
   
   return (
-    <Layout>
+    <Layout requireAuth={true}>
       <div className="container mx-auto px-4 py-6 max-w-5xl">
         <div className="flex flex-col items-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-cycle-primary mb-2">CycleInsight Companion</h1>
