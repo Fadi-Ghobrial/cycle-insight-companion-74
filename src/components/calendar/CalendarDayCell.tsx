@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { CycleDay, CyclePhase, FlowLevel } from '@/types';
@@ -68,16 +67,16 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
     const symptoms = cycleDay.symptoms.slice(0, 3);
     
     return (
-      <div className="flex justify-center mt-1 space-x-0.5">
+      <div className="flex justify-center mt-1 space-x-0.5 absolute bottom-1 left-0 right-0">
         {symptoms.map((symptom, index) => (
           <div 
             key={index} 
-            className="w-1.5 h-1.5 rounded-full bg-symptom-mood"
+            className="w-1.5 h-1.5 rounded-full bg-white/70"
             title={symptom}
           />
         ))}
         {cycleDay.symptoms.length > 3 && (
-          <div className="w-1.5 h-1.5 rounded-full bg-gray-400" title="More symptoms" />
+          <div className="w-1.5 h-1.5 rounded-full bg-gray-300/70" title="More symptoms" />
         )}
       </div>
     );
@@ -93,24 +92,24 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
     switch (phase) {
       case CyclePhase.MENSTRUAL:
         phaseLabel = 'Period';
-        phaseColor = 'text-phase-menstrual';
+        phaseColor = 'text-white';
         break;
       case CyclePhase.FOLLICULAR:
         phaseLabel = 'Follicular';
-        phaseColor = 'text-phase-follicular';
+        phaseColor = 'text-white';
         break;
       case CyclePhase.OVULATION:
         phaseLabel = 'Ovulation';
-        phaseColor = 'text-phase-ovulation';
+        phaseColor = 'text-white';
         break;
       case CyclePhase.LUTEAL:
         phaseLabel = 'Luteal';
-        phaseColor = 'text-phase-luteal';
+        phaseColor = 'text-white';
         break;
     }
     
     return !cycleDay?.flow ? (
-      <div className={`absolute bottom-0 left-0 right-0 text-[0.6rem] text-center ${phaseColor} font-medium truncate px-0.5`}>
+      <div className={`absolute bottom-0 left-0 right-0 text-[0.6rem] text-center ${phaseColor} font-medium truncate px-0.5 bg-black/40`}>
         {phaseLabel}
       </div>
     ) : null;
@@ -121,7 +120,7 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
   return (
     <div
       className={cn(
-        "aspect-square p-1 border border-gray-100 relative",
+        "aspect-square p-1 border border-gray-100 relative overflow-hidden",
         !isCurrentMonth && "text-gray-300",
         isToday && "border-cycle-primary",
         getPhaseColor(phase),
@@ -147,7 +146,7 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         
         {cycleDay?.flow && (
           <div className={cn(
-            "absolute bottom-0 left-0 right-0 top-6 rounded-b",
+            "absolute bottom-0 left-0 right-0 top-6 rounded-b bg-black/20",
             getFlowColor(cycleDay.flow)
           )} />
         )}
