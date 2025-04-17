@@ -19,6 +19,9 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
   onSave,
   onDelete
 }) => {
+  // Ensure date is properly initialized as a Date object
+  const modalDate = date instanceof Date ? date : new Date(date);
+  
   const [flow, setFlow] = useState<FlowLevel | undefined>(cycleDay?.flow);
   const [symptoms, setSymptoms] = useState<Symptom[]>(cycleDay?.symptoms || []);
   const [notes, setNotes] = useState<string>(cycleDay?.notes || '');
@@ -38,11 +41,11 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
   }, [onClose]);
   
   const handleSave = () => {
-    onSave(date, { flow, symptoms, notes });
+    onSave(modalDate, { flow, symptoms, notes });
   };
   
   const handleDelete = () => {
-    onDelete(date);
+    onDelete(modalDate);
   };
   
   const toggleSymptom = (symptom: Symptom) => {
@@ -58,7 +61,7 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b p-4">
           <h3 className="text-lg font-semibold text-gray-900">
-            {format(date, 'EEEE, MMMM d, yyyy')}
+            {format(modalDate, 'EEEE, MMMM d, yyyy')}
           </h3>
           
           <button 

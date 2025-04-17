@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight, RotateCcw, Undo2, RefreshCw } from 'lucide-react';
@@ -38,10 +37,12 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
   };
   
   const handleDayClick = (day: Date) => {
-    setSelectedDate(day);
+    const clickedDate = new Date(day.getTime());
+    setSelectedDate(clickedDate);
     setShowDayDetail(true);
+    
     if (onDayClick) {
-      onDayClick(day);
+      onDayClick(clickedDate);
     }
   };
   
@@ -50,7 +51,6 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
   };
   
   const handleAddOrUpdateDay = (date: Date, data: { flow?: FlowLevel, symptoms?: any[], notes?: string }) => {
-    // Find if day already exists
     const existingDay = cycleDays.find(
       day => isSameDay(new Date(day.date), date)
     );
@@ -157,20 +157,16 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     let days = [];
     let day = startDate;
     
-    // Find current cycle
     const currentCycle = cycles && currentCycleId ? cycles.find(cycle => cycle.id === currentCycleId) : undefined;
     
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
-        // Get cycle day if exists
         const cycleDay = cycleDays.find(cDay => 
           isSameDay(new Date(cDay.date), day)
         );
         
-        // Determine phase from predictions
         let phase: CyclePhase | undefined;
         if (currentCycle?.predictions?.phases) {
-          // Check each phase to see if this day falls within it
           for (const phasePrediction of currentCycle.predictions.phases) {
             const phaseStart = new Date(phasePrediction.startDate);
             const phaseEnd = new Date(phasePrediction.endDate);
@@ -182,15 +178,17 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
           }
         }
         
+        const currentDay = new Date(day.getTime());
+        
         days.push(
           <CalendarDayCell
-            key={day.toString()}
-            day={new Date(day)}
+            key={currentDay.toString()}
+            day={currentDay}
             cycleDay={cycleDay}
             phase={phase}
-            isCurrentMonth={isSameMonth(day, monthStart)}
-            isToday={isSameDay(day, new Date())}
-            onClick={() => handleDayClick(new Date(day))}
+            isCurrentMonth={isSameMonth(currentDay, monthStart)}
+            isToday={isSameDay(currentDay, new Date())}
+            onClick={() => handleDayClick(currentDay)}
           />
         );
         
