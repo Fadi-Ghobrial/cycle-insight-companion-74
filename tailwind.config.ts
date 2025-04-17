@@ -61,6 +61,28 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Period tracker custom colors
+				cycle: {
+					primary: '#9b87f5',
+					secondary: '#7E69AB',
+					tertiary: '#6E59A5',
+					dark: '#1A1F2C',
+					light: '#D6BCFA',
+				},
+				phase: {
+					menstrual: '#D946EF',
+					follicular: '#E5DEFF',
+					ovulation: '#FEF7CD',
+					luteal: '#FDE1D3',
+				},
+				symptom: {
+					pain: '#ea384c',
+					mood: '#0EA5E9',
+					energy: '#F97316',
+					sleep: '#8B5CF6',
+					skin: '#D3E4FD',
+					other: '#F1F0FB',
 				}
 			},
 			borderRadius: {
