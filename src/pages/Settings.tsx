@@ -119,6 +119,7 @@ const Settings: React.FC = () => {
       repeat: reminderInput.repeat,
       repeatInterval: 'daily',
       enabled: reminderInput.enabled,
+      userId: 'test-user' // Add userId to fix type error
     });
     
     toast({

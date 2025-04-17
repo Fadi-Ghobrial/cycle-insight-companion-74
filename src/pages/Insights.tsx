@@ -1,15 +1,18 @@
-
 import React, { useState } from 'react';
-import { format, differenceInDays } from 'date-fns';
-import { useAppStore } from '@/lib/store';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { DropletIcon, CalendarIcon, ThermometerIcon, ActivityIcon, BarChart3 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { CyclePhase, FlowLevel, Symptom } from '@/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PieChart, Pie, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useAppStore } from '@/lib/store';
+import { format, differenceInDays } from 'date-fns';
+import { Symptom } from '@/types';
+
+const formatSymptomName = (name: string | number): string => {
+  if (typeof name === 'string') {
+    return name.replace('_', ' ');
+  }
+  return name.toString();
+};
 
 const Insights: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -17,7 +20,6 @@ const Insights: React.FC = () => {
   
   const currentCycle = cycles.find(c => c.id === currentCycleId);
   
-  // Calculate cycle stats
   const calculateStats = () => {
     if (cycleDays.length === 0) {
       return {
@@ -29,13 +31,11 @@ const Insights: React.FC = () => {
       };
     }
     
-    // Sort cycle days by date
     const sortedDays = [...cycleDays].sort((a, b) => 
       new Date(a.date).getTime() - new Date(b.date).getTime()
     );
     
-    // Calculate average cycle length
-    let avgCycleLength = 28; // Default
+    let avgCycleLength = 28;
     if (cycles.length > 1) {
       const cycleLengths = cycles
         .filter(c => c.daysInCycle)
@@ -46,7 +46,6 @@ const Insights: React.FC = () => {
       }
     }
     
-    // Calculate average period length
     const periodDays = sortedDays.filter(day => day.flow !== undefined);
     const periods: Array<{start: Date, days: number}> = [];
     
@@ -55,19 +54,16 @@ const Insights: React.FC = () => {
     
     periodDays.forEach((day, i) => {
       if (i === 0 || differenceInDays(day.date, periodDays[i-1].date) > 1) {
-        // Start of a new period
         if (currentPeriodStart !== null) {
           periods.push({ start: currentPeriodStart, days: currentPeriodDays });
         }
         currentPeriodStart = day.date;
         currentPeriodDays = 1;
       } else {
-        // Continuation of current period
         currentPeriodDays++;
       }
     });
     
-    // Add the last period if it exists
     if (currentPeriodStart !== null) {
       periods.push({ start: currentPeriodStart, days: currentPeriodDays });
     }
@@ -76,7 +72,6 @@ const Insights: React.FC = () => {
       ? periods.reduce((sum, period) => sum + period.days, 0) / periods.length
       : 0;
     
-    // Calculate next period date and days until
     let nextPeriodDate = null;
     let daysUntilNextPeriod = 0;
     
@@ -85,7 +80,6 @@ const Insights: React.FC = () => {
       daysUntilNextPeriod = differenceInDays(nextPeriodDate, new Date());
     }
     
-    // Calculate most common symptoms
     const symptomCounts: Record<string, number> = {};
     
     sortedDays.forEach(day => {
@@ -112,7 +106,6 @@ const Insights: React.FC = () => {
   
   const stats = calculateStats();
   
-  // Prepare data for temperature chart
   const prepareTemperatureData = () => {
     if (cycleDays.length === 0) return [];
     
@@ -125,7 +118,6 @@ const Insights: React.FC = () => {
       }));
   };
   
-  // Prepare data for symptom chart
   const prepareSymptomData = () => {
     if (cycleDays.length === 0) return [];
     
@@ -146,7 +138,6 @@ const Insights: React.FC = () => {
   const temperatureData = prepareTemperatureData();
   const symptomData = prepareSymptomData();
   
-  // Colors for pie chart
   const COLORS = ['#8884d8', '#83a6ed', '#8dd1e1', '#82ca9d', '#a4de6c', '#d0ed57'];
   
   return (
@@ -161,7 +152,6 @@ const Insights: React.FC = () => {
             <TabsTrigger value="predictions">Predictions</TabsTrigger>
           </TabsList>
           
-          {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card>
@@ -335,7 +325,6 @@ const Insights: React.FC = () => {
             </div>
           </TabsContent>
           
-          {/* Charts Tab */}
           <TabsContent value="charts" className="space-y-6">
             <Card>
               <CardHeader>
@@ -388,13 +377,13 @@ const Insights: React.FC = () => {
                         outerRadius={100}
                         fill="#8884d8"
                         dataKey="value"
-                        label={({ name }) => name.replace('_', ' ')}
+                        label={({ name }) => formatSymptomName(name)}
                       >
                         {symptomData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value, name) => [value, name.replace('_', ' ')]} />
+                      <Tooltip formatter={(value, name) => [value, formatSymptomName(name)]} />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
@@ -406,7 +395,6 @@ const Insights: React.FC = () => {
             </Card>
           </TabsContent>
           
-          {/* Predictions Tab */}
           <TabsContent value="predictions" className="space-y-6">
             <Card>
               <CardHeader>

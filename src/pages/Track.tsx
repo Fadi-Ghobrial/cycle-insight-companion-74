@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar } from '@/components/ui/calendar';
@@ -28,16 +27,13 @@ const Track: React.FC = () => {
   const { addCycleDay, cycleDays } = useAppStore();
   const navigate = useNavigate();
   
-  // Check if there's existing data for the selected date
   const existingData = cycleDays.find(
     day => format(day.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
   );
   
-  // Handle showing dialog when a date is selected
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
       setDate(date);
-      // Load existing data if available
       if (existingData) {
         setSelectedFlow(existingData.flow);
         setSelectedMood(existingData.mood);
@@ -45,7 +41,6 @@ const Track: React.FC = () => {
         setTemperature(existingData.baselTemperature);
         setNotes(existingData.notes || "");
       } else {
-        // Reset form if no existing data
         setSelectedFlow(undefined);
         setSelectedMood(undefined);
         setSelectedSymptoms([]);
@@ -56,7 +51,6 @@ const Track: React.FC = () => {
     }
   };
   
-  // Handle saving the tracking data
   const handleSave = () => {
     addCycleDay({
       date,
@@ -73,11 +67,9 @@ const Track: React.FC = () => {
     });
     
     setIsDialogOpen(false);
-    // Navigate to calendar to see the updated data
     navigate('/calendar');
   };
   
-  // Toggle a symptom selection
   const toggleSymptom = (symptom: Symptom) => {
     if (selectedSymptoms.includes(symptom)) {
       setSelectedSymptoms(selectedSymptoms.filter(s => s !== symptom));
@@ -149,7 +141,6 @@ const Track: React.FC = () => {
                         description: "Your period has been logged for today."
                       });
                       
-                      // Navigate to calendar
                       navigate('/calendar');
                     } else {
                       toast({
@@ -167,7 +158,6 @@ const Track: React.FC = () => {
           </Card>
         </div>
         
-        {/* Track Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="max-w-md mx-auto">
             <DialogHeader>

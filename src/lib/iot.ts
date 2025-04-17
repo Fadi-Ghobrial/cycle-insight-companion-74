@@ -272,3 +272,35 @@ export function createIoTService(): IoTService {
   
   return service;
 }
+
+// Add the missing functions that are being imported in Settings.tsx
+export const checkIoTConnectivity = async (deviceType: string): Promise<boolean> => {
+  // Create a temporary service and check if a device of the specified type can connect
+  const service = createIoTService();
+  const devices = service.getAllDevices();
+  
+  for (const device of devices) {
+    if (device.type.includes(deviceType)) {
+      return await device.connect();
+    }
+  }
+  
+  return false;
+};
+
+export const sendTestNotification = async (deviceType: string, message: string): Promise<boolean> => {
+  // Create a temporary service and send a test message to a device of the specified type
+  const service = createIoTService();
+  const devices = service.getAllDevices();
+  
+  for (const device of devices) {
+    if (device.type.includes(deviceType)) {
+      if (!device.isConnected) {
+        await device.connect();
+      }
+      return await device.sendMessage(message);
+    }
+  }
+  
+  return false;
+};
