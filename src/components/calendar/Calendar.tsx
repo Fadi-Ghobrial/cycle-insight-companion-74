@@ -1,10 +1,12 @@
+
 import React, { useState } from 'react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
-import { ChevronLeft, ChevronRight, RotateCcw, Undo2, RefreshCw } from 'lucide-react';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths, differenceInDays } from 'date-fns';
+import { ChevronLeft, ChevronRight, RotateCcw, Undo2, RefreshCw, Info } from 'lucide-react';
 import { CycleDay, FlowLevel, Cycle, CyclePhase } from '@/types';
 import { useAppStore } from '@/lib/store';
 import CalendarDayCell from './CalendarDayCell';
 import DayDetailModal from './DayDetailModal';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CalendarProps {
   onDayClick?: (date: Date) => void;
@@ -82,6 +84,14 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     setShowDayDetail(false);
   };
   
+  // Get the current cycle and its predictions
+  const currentCycle = cycles.find(cycle => cycle.id === currentCycleId);
+  const predictions = currentCycle?.predictions;
+  
+  // Get next period date
+  const nextPeriodStart = predictions?.nextPeriodStart ? new Date(predictions.nextPeriodStart) : undefined;
+  const daysUntilNextPeriod = nextPeriodStart ? differenceInDays(nextPeriodStart, new Date()) : undefined;
+  
   const renderHeader = () => {
     return (
       <div className="flex items-center justify-between mb-4 px-2">
@@ -104,29 +114,53 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
           
           <div className="h-6 border-r border-gray-300 mx-1"></div>
           
-          <button 
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-600 flex items-center"
-            onClick={undo}
-            title="Undo last action"
-          >
-            <Undo2 size={18} />
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  className="p-2 rounded-full hover:bg-gray-100 text-gray-600 flex items-center"
+                  onClick={undo}
+                >
+                  <Undo2 size={18} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Undo last action</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           
-          <button 
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-600 flex items-center"
-            onClick={recalculatePredictions}
-            title="Re-evaluate predictions"
-          >
-            <RefreshCw size={18} />
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  className="p-2 rounded-full hover:bg-gray-100 text-gray-600 flex items-center"
+                  onClick={recalculatePredictions}
+                >
+                  <RefreshCw size={18} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Re-evaluate predictions</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           
-          <button 
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-600 flex items-center"
-            onClick={reset}
-            title="Reset all data"
-          >
-            <RotateCcw size={18} />
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  className="p-2 rounded-full hover:bg-gray-100 text-gray-600 flex items-center"
+                  onClick={reset}
+                >
+                  <RotateCcw size={18} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Reset all data</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     );
@@ -207,11 +241,59 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     return <div className="bg-white rounded-lg overflow-hidden">{rows}</div>;
   };
   
+  const renderPredictionSummary = () => {
+    if (!predictions) return null;
+    
+    return (
+      <div className="mt-4 bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+        <h3 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+          <Info size={14} className="mr-1 text-cycle-primary" />
+          Cycle Predictions
+        </h3>
+        
+        <div className="space-y-2 text-sm">
+          {nextPeriodStart && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Next period:</span>
+              <span className="font-medium">
+                {format(nextPeriodStart, 'MMM d')}
+                {daysUntilNextPeriod !== undefined && (
+                  <span className="text-xs text-gray-500 ml-1">
+                    (in {daysUntilNextPeriod} days)
+                  </span>
+                )}
+              </span>
+            </div>
+          )}
+          
+          {predictions.nextFertileWindowStart && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Fertile window:</span>
+              <span className="font-medium">
+                {format(new Date(predictions.nextFertileWindowStart), 'MMM d')} - {format(new Date(predictions.nextFertileWindowEnd), 'MMM d')}
+              </span>
+            </div>
+          )}
+          
+          {predictions.nextOvulationDate && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Ovulation:</span>
+              <span className="font-medium">
+                {format(new Date(predictions.nextOvulationDate), 'MMM d')}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+  
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
       {renderHeader()}
       {renderDays()}
       {renderCells()}
+      {renderPredictionSummary()}
       
       {showDayDetail && selectedDate && (
         <DayDetailModal

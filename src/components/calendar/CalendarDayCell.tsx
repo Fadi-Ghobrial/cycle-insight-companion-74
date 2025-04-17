@@ -3,6 +3,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import { CycleDay, CyclePhase, FlowLevel } from '@/types';
 import { cn } from '@/lib/utils';
+import { Info } from 'lucide-react';
 
 interface CalendarDayCellProps {
   day: Date;
@@ -82,10 +83,45 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
     );
   };
   
+  // Get phase icon or label
+  const getPhaseIndicator = () => {
+    if (!phase) return null;
+    
+    let phaseLabel = '';
+    let phaseColor = '';
+    
+    switch (phase) {
+      case CyclePhase.MENSTRUAL:
+        phaseLabel = 'Period';
+        phaseColor = 'text-phase-menstrual';
+        break;
+      case CyclePhase.FOLLICULAR:
+        phaseLabel = 'Follicular';
+        phaseColor = 'text-phase-follicular';
+        break;
+      case CyclePhase.OVULATION:
+        phaseLabel = 'Ovulation';
+        phaseColor = 'text-phase-ovulation';
+        break;
+      case CyclePhase.LUTEAL:
+        phaseLabel = 'Luteal';
+        phaseColor = 'text-phase-luteal';
+        break;
+    }
+    
+    return !cycleDay?.flow ? (
+      <div className={`absolute bottom-0 left-0 right-0 text-[0.6rem] text-center ${phaseColor} font-medium truncate px-0.5`}>
+        {phaseLabel}
+      </div>
+    ) : null;
+  };
+  
+  const hasData = cycleDay || phase;
+  
   return (
     <div
       className={cn(
-        "aspect-square p-1 border border-gray-100",
+        "aspect-square p-1 border border-gray-100 relative",
         !isCurrentMonth && "text-gray-300",
         isToday && "border-cycle-primary",
         getPhaseColor(phase),
@@ -94,8 +130,19 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
       onClick={onClick}
     >
       <div className="h-full w-full relative">
-        <div className="text-right text-xs p-1">
-          {format(day, 'd')}
+        <div className="flex justify-between items-start text-xs p-1">
+          <span className={isToday ? "font-bold text-cycle-primary" : ""}>
+            {format(day, 'd')}
+          </span>
+          
+          {hasData && (
+            <div 
+              className="w-3 h-3 flex items-center justify-center"
+              title={phase ? `Phase: ${phase}` : 'View details'}
+            >
+              {hasData && <Info size={10} className="text-gray-500" />}
+            </div>
+          )}
         </div>
         
         {cycleDay?.flow && (
@@ -106,6 +153,7 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         )}
         
         {getSymptomIndicators()}
+        {getPhaseIndicator()}
       </div>
     </div>
   );
