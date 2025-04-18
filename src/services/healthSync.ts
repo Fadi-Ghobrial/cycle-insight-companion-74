@@ -10,7 +10,7 @@ export interface HealthConnection {
   app_type: 'apple_health' | 'samsung_health';
   enabled: boolean;
   last_sync_at: Date | null;
-  sync_settings: Record<string, any>;
+  sync_settings: Json; // Changed from Record<string, any> to Json
   user_id: string;
 }
 
