@@ -1,4 +1,3 @@
-
 /**
  * Apple HealthKit integration
  */
@@ -13,9 +12,13 @@ interface HealthKitData {
 
 // Check if HealthKit is available (in a real implementation, this would check if running on iOS)
 const isHealthKitAvailable = (): boolean => {
-  // In a real implementation, this would check if we're on iOS and if HealthKit is available
-  // For now, we'll simulate it being available
-  return true;
+  // Check if running in a native iOS environment (this would be replaced with actual native bridge check)
+  const isNativePlatform = window.location.href.includes('capacitor://') || 
+                          window.location.href.includes('ionic://') ||
+                          /iPad|iPhone|iPod/.test(navigator.userAgent);
+  
+  console.log('Checking HealthKit availability:', isNativePlatform);
+  return isNativePlatform;
 };
 
 // Request HealthKit authorization
@@ -27,15 +30,28 @@ export const connectToAppleHealth = async (): Promise<boolean> => {
     return false;
   }
 
-  // Simulate authorization request with types
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Simulate successful authorization 80% of the time
-      const success = Math.random() < 0.8;
-      console.log(`HealthKit authorization ${success ? 'granted' : 'denied'}`);
-      resolve(success);
-    }, 1500);
-  });
+  // In a real implementation, this would trigger the native authorization flow
+  // For now, we'll simulate the authorization process
+  if (process.env.NODE_ENV === 'development') {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const success = Math.random() < 0.8;
+        console.log(`HealthKit authorization ${success ? 'granted' : 'denied'}`);
+        resolve(success);
+      }, 1500);
+    });
+  }
+
+  // This would be replaced with actual native bridge code in production
+  try {
+    const callback = encodeURIComponent(window.location.href);
+    // This is just a placeholder - in a real implementation this would be handled by your native bridge
+    window.location.href = `healthkit://authorize?redirect=${callback}`;
+    return true;
+  } catch (error) {
+    console.error('Error connecting to HealthKit:', error);
+    return false;
+  }
 };
 
 export const fetchHealthData = async (
@@ -113,4 +129,3 @@ export const syncCycleData = async (cycleData: HealthKitData[]): Promise<boolean
     }, 1200);
   });
 };
-
