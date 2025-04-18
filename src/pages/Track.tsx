@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { FlowLevel, Mood, Symptom } from '@/types';
@@ -11,7 +10,7 @@ import { Calendar } from '@/components/ui/calendar';
 const Track: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [flowLevel, setFlowLevel] = useState<FlowLevel | undefined>(undefined);
-  const [moods, setMoods] = useState<Mood[]>([]); // Changed from mood to moods array
+  const [moods, setMoods] = useState<Mood[]>([]);
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [temperature, setTemperature] = useState<number | undefined>(undefined);
   const [notes, setNotes] = useState<string>('');
@@ -41,6 +40,30 @@ const Track: React.FC = () => {
     }
   };
   
+  const handleQuickAdd = () => {
+    addCycleDay({
+      date: selectedDate,
+      flow: FlowLevel.MEDIUM,
+      symptoms: [],
+      moods: [],
+      userId: user?.id || 'guest'
+    });
+    
+    toast({
+      title: "Flow added",
+      description: "Medium flow added for the selected date.",
+    });
+  };
+  
+  const handleReset = () => {
+    setSelectedDate(new Date());
+    setFlowLevel(undefined);
+    setMoods([]);
+    setSymptoms([]);
+    setTemperature(undefined);
+    setNotes('');
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -58,7 +81,7 @@ const Track: React.FC = () => {
     addCycleDay({
       date: selectedDate,
       flow: flowLevel,
-      moods: moods, // Updated to pass moods array
+      moods: moods,
       symptoms: symptoms,
       baselTemperature: temperature,
       notes: notes,
@@ -71,11 +94,7 @@ const Track: React.FC = () => {
     });
     
     // Reset form
-    setFlowLevel(undefined);
-    setMoods([]); // Reset moods array
-    setSymptoms([]);
-    setTemperature(undefined);
-    setNotes('');
+    handleReset();
   };
   
   return (
@@ -220,31 +239,15 @@ const Track: React.FC = () => {
                 <div className="grid grid-cols-2 gap-2">
                   <Button 
                     variant="outline"
-                    onClick={() => {
-                      addCycleDay({
-                        date: selectedDate,
-                        flow: FlowLevel.MEDIUM,
-                        symptoms: [],
-                        userId: user?.id || 'guest'
-                      });
-                      toast({
-                        title: "Flow added",
-                        description: "Medium flow added for the selected date.",
-                      });
-                    }}
+                    onClick={handleQuickAdd}
+                    className="w-full"
                   >
                     Add Flow
                   </Button>
                   <Button 
                     variant="outline"
-                    onClick={() => {
-                      setSelectedDate(new Date());
-                      setFlowLevel(undefined);
-                      setMood(undefined);
-                      setSymptoms([]);
-                      setTemperature(undefined);
-                      setNotes('');
-                    }}
+                    onClick={handleReset}
+                    className="w-full"
                   >
                     Clear Form
                   </Button>

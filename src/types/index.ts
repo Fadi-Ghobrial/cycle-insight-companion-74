@@ -1,4 +1,3 @@
-
 // User related types
 export interface User {
   id: string;
@@ -167,4 +166,27 @@ export interface PredictionModel {
   accuracy: number;
   lastTrainedOn: Date;
   features: string[];
+}
+
+// Educational content types
+export interface Article {
+  id: string;
+  title: string;
+  category: ArticleCategory;
+  summary: string;
+  content: string;
+  lastUpdated: Date;
+  readTime: number; // in minutes
+  vetted: boolean;
+  author: string;
+  sources?: string[];
+}
+
+export enum ArticleCategory {
+  BASICS = 'menstrual_basics',
+  HEALTH = 'menstrual_health',
+  SYMPTOMS = 'symptoms_and_conditions',
+  WELLNESS = 'wellness_and_lifestyle',
+  MYTHS = 'myths_and_facts',
+  SCIENCE = 'science_and_research'
 }

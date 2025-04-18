@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthStatus } from '@/lib/auth-provider';
-import { CalendarIcon, HomeIcon, LineChartIcon, Settings2Icon } from 'lucide-react';
+import { CalendarIcon, HomeIcon, LineChartIcon, Settings2Icon, BookOpen } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
@@ -42,6 +41,12 @@ const Navbar: React.FC = () => {
               className={`text-gray-700 hover:text-cycle-primary ${isActive('/insights') ? 'text-cycle-primary font-medium' : ''}`}
             >
               Insights
+            </Link>
+            <Link 
+              to="/learn" 
+              className={`text-gray-700 hover:text-cycle-primary ${isActive('/learn') ? 'text-cycle-primary font-medium' : ''}`}
+            >
+              Learn
             </Link>
             <Link 
               to="/settings" 
@@ -111,11 +116,11 @@ const Navbar: React.FC = () => {
           </Link>
           
           <Link 
-            to="/settings" 
-            className={`flex flex-col items-center justify-center ${isActive('/settings') ? 'text-cycle-primary' : 'text-gray-500'}`}
+            to="/learn" 
+            className={`flex flex-col items-center justify-center ${isActive('/learn') ? 'text-cycle-primary' : 'text-gray-500'}`}
           >
-            <Settings2Icon size={20} />
-            <span className="text-xs mt-1">Settings</span>
+            <BookOpen size={20} />
+            <span className="text-xs mt-1">Learn</span>
           </Link>
         </div>
       </div>
