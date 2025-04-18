@@ -14,9 +14,9 @@ export interface CycleDay {
   date: Date;
   flow?: FlowLevel;
   symptoms: Symptom[];
-  mood?: Mood;
+  moods: Mood[]; // Changed from mood?: Mood to moods: Mood[]
   notes?: string;
-  baselTemperature?: number; // Basal body temperature
+  baselTemperature?: number;
   lhTestResult?: LHTestResult;
   createdAt: Date;
   updatedAt: Date;

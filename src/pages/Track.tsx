@@ -11,7 +11,7 @@ import { Calendar } from '@/components/ui/calendar';
 const Track: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [flowLevel, setFlowLevel] = useState<FlowLevel | undefined>(undefined);
-  const [mood, setMood] = useState<Mood | undefined>(undefined);
+  const [moods, setMoods] = useState<Mood[]>([]); // Changed from mood to moods array
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [temperature, setTemperature] = useState<number | undefined>(undefined);
   const [notes, setNotes] = useState<string>('');
@@ -24,7 +24,13 @@ const Track: React.FC = () => {
   };
   
   const handleMoodSelect = (selectedMood: Mood) => {
-    setMood(mood === selectedMood ? undefined : selectedMood);
+    setMoods(prevMoods => {
+      if (prevMoods.includes(selectedMood)) {
+        return prevMoods.filter(m => m !== selectedMood);
+      } else {
+        return [...prevMoods, selectedMood];
+      }
+    });
   };
   
   const handleSymptomToggle = (symptom: Symptom) => {
@@ -39,7 +45,7 @@ const Track: React.FC = () => {
     e.preventDefault();
     
     // Check if we have at least one piece of data
-    if (!flowLevel && !mood && symptoms.length === 0 && !temperature && !notes) {
+    if (!flowLevel && moods.length === 0 && symptoms.length === 0 && !temperature && !notes) {
       toast({
         title: "Error",
         description: "Please add at least one type of data to track.",
@@ -52,7 +58,7 @@ const Track: React.FC = () => {
     addCycleDay({
       date: selectedDate,
       flow: flowLevel,
-      mood: mood,
+      moods: moods, // Updated to pass moods array
       symptoms: symptoms,
       baselTemperature: temperature,
       notes: notes,
@@ -66,7 +72,7 @@ const Track: React.FC = () => {
     
     // Reset form
     setFlowLevel(undefined);
-    setMood(undefined);
+    setMoods([]); // Reset moods array
     setSymptoms([]);
     setTemperature(undefined);
     setNotes('');
@@ -110,14 +116,14 @@ const Track: React.FC = () => {
                 
                 {/* Mood Tracking */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Mood</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Moods (Select multiple)</label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {Object.values(Mood).map(moodOption => (
                       <button
                         key={moodOption}
                         type="button"
                         className={`py-2 px-4 rounded-lg text-sm ${
-                          mood === moodOption 
+                          moods.includes(moodOption)
                             ? 'bg-symptom-mood text-white' 
                             : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
                         }`}

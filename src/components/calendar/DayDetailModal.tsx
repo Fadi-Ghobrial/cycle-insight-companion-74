@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { CycleDay, FlowLevel, Symptom, Mood } from '@/types';
@@ -8,7 +7,7 @@ interface DayDetailModalProps {
   date: Date;
   cycleDay?: CycleDay;
   onClose: () => void;
-  onSave: (date: Date, data: { flow?: FlowLevel, symptoms?: Symptom[], mood?: Mood, notes?: string }) => void;
+  onSave: (date: Date, data: { flow?: FlowLevel, symptoms?: Symptom[], moods?: Mood[], notes?: string }) => void;
   onDelete: (date: Date) => void;
 }
 
@@ -23,7 +22,7 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
   
   const [flow, setFlow] = useState<FlowLevel | undefined>(cycleDay?.flow);
   const [symptoms, setSymptoms] = useState<Symptom[]>(cycleDay?.symptoms || []);
-  const [mood, setMood] = useState<Mood | undefined>(cycleDay?.mood);
+  const [moods, setMoods] = useState<Mood[]>(cycleDay?.moods || []); // Changed to array
   const [notes, setNotes] = useState<string>(cycleDay?.notes || '');
   const [showPreviousEntries, setShowPreviousEntries] = useState<boolean>(false);
   const [editMode, setEditMode] = useState<boolean>(!cycleDay);
@@ -41,7 +40,7 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
   }, [onClose]);
   
   const handleSave = () => {
-    onSave(modalDate, { flow, symptoms, mood, notes });
+    onSave(modalDate, { flow, symptoms, moods, notes }); // Updated to pass moods array
     setEditMode(false);
   };
   
@@ -57,6 +56,16 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
     }
   };
   
+  const handleMoodSelect = (selectedMood: Mood) => {
+    setMoods(prevMoods => {
+      if (prevMoods.includes(selectedMood)) {
+        return prevMoods.filter(m => m !== selectedMood);
+      } else {
+        return [...prevMoods, selectedMood];
+      }
+    });
+  };
+
   const getMoodColor = (selectedMood: Mood) => {
     switch (selectedMood) {
       case Mood.HAPPY:
@@ -155,6 +164,25 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
                 </div>
               )}
               
+              {moods.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <SmileIcon className="text-yellow-500" />
+                  <div>
+                    <h3 className="font-medium">Moods</h3>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {moods.map(mood => (
+                        <span
+                          key={mood}
+                          className={`px-2 py-1 rounded-md text-sm ${getMoodColor(mood)}`}
+                        >
+                          {mood.toLowerCase().replace('_', ' ')}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               {symptoms.length > 0 && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Symptoms</h4>
@@ -167,16 +195,6 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
                         {symptom.charAt(0).toUpperCase() + symptom.slice(1).replace('_', ' ')}
                       </span>
                     ))}
-                  </div>
-                </div>
-              )}
-              
-              {cycleDay?.mood && (
-                <div className="flex items-center gap-2">
-                  <SmileIcon className="text-yellow-500" />
-                  <div>
-                    <h3 className="font-medium">Mood</h3>
-                    <p className="capitalize">{cycleDay.mood.toLowerCase().replace('_', ' ')}</p>
                   </div>
                 </div>
               )}
@@ -233,15 +251,15 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
               </div>
               
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Mood</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Moods (Select multiple)</label>
                 <div className="grid grid-cols-3 gap-2">
                   {Object.values(Mood).map(moodOption => (
                     <button
                       key={moodOption}
                       className={`py-2 px-3 rounded-md text-xs font-medium border ${
-                        mood === moodOption ? getMoodColor(moodOption) : 'bg-gray-100 text-gray-800'
+                        moods.includes(moodOption) ? getMoodColor(moodOption) : 'bg-gray-100 text-gray-800'
                       }`}
-                      onClick={() => setMood(mood === moodOption ? undefined : moodOption)}
+                      onClick={() => handleMoodSelect(moodOption)}
                     >
                       {moodOption.toLowerCase().replace('_', ' ')}
                     </button>
@@ -266,6 +284,7 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
                     if (cycleDay) {
                       setFlow(cycleDay.flow);
                       setSymptoms(cycleDay.symptoms || []);
+                      setMoods(cycleDay.moods || []);
                       setNotes(cycleDay.notes || '');
                       setEditMode(false);
                     } else {
