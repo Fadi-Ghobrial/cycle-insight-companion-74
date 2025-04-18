@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ThumbsUp } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { addDays } from 'date-fns';
+import { addDays, format } from 'date-fns';
 
 interface CarouselCard {
   id: string;
@@ -49,13 +49,28 @@ export function PeriodCarousel() {
   
   const handleCompletedCard = async (cardId: string) => {
     try {
+      const user = await supabase.auth.getUser();
+      const userId = user.data.user?.id;
+      
+      if (!userId) {
+        toast({
+          title: "Authentication Error",
+          description: "Please sign in to track your progress",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Format the date to ISO string for PostgreSQL timestamp compatibility
+      const nextAvailableDate = addDays(new Date(), 2).toISOString();
+      
       const { error } = await supabase
         .from('education_progress')
         .upsert({
           content_id: cardId,
           completed: true,
-          next_available_at: addDays(new Date(), 2),
-          user_id: (await supabase.auth.getUser()).data.user?.id
+          next_available_at: nextAvailableDate,
+          user_id: userId
         });
 
       if (error) throw error;
