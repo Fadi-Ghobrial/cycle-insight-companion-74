@@ -12,6 +12,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Learn from "./pages/Learn";
+import LearnCategory from "./pages/LearnCategory";
 import Layout from "./components/layout/Layout";
 import { AppAuthProvider } from "./lib/auth-provider";
 
@@ -37,6 +38,7 @@ const App = () => {
             <Route path="/track" element={<Track />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/learn" element={<Learn />} />
+            <Route path="/learn/:category" element={<LearnCategory />} />
             <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths, differenceInDays } from 'date-fns';
 import { ChevronLeft, ChevronRight, RotateCcw, Undo2, RefreshCw, Info } from 'lucide-react';
@@ -52,7 +51,7 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     setShowDayDetail(false);
   };
   
-  const handleAddOrUpdateDay = (date: Date, data: { flow?: FlowLevel, symptoms?: any[], notes?: string }) => {
+  const handleAddOrUpdateDay = (date: Date, data: { flow?: FlowLevel, symptoms?: any[], moods?: any[], notes?: string }) => {
     const existingDay = cycleDays.find(
       day => isSameDay(new Date(day.date), date)
     );
@@ -64,6 +63,7 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
         date: date,
         flow: data.flow,
         symptoms: data.symptoms || [],
+        moods: data.moods || [],
         notes: data.notes || '',
         userId: user?.id || 'guest'
       });
@@ -84,11 +84,9 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     setShowDayDetail(false);
   };
   
-  // Get the current cycle and its predictions
   const currentCycle = cycles.find(cycle => cycle.id === currentCycleId);
   const predictions = currentCycle?.predictions;
   
-  // Get next period date
   const nextPeriodStart = predictions?.nextPeriodStart ? new Date(predictions.nextPeriodStart) : undefined;
   const daysUntilNextPeriod = nextPeriodStart ? differenceInDays(nextPeriodStart, new Date()) : undefined;
   
