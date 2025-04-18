@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthStatus } from '@/lib/auth-provider';
-import { CalendarIcon, HomeIcon, LineChartIcon, Settings2Icon, BookOpen } from 'lucide-react';
+import { CalendarIcon, HomeIcon, LineChartIcon, Settings2Icon, BookOpen, Flag } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
@@ -49,6 +49,12 @@ const Navbar: React.FC = () => {
               Learn
             </Link>
             <Link 
+              to="/milestones" 
+              className={`text-gray-700 hover:text-cycle-primary ${isActive('/milestones') ? 'text-cycle-primary font-medium' : ''}`}
+            >
+              Milestones
+            </Link>
+            <Link 
               to="/settings" 
               className={`text-gray-700 hover:text-cycle-primary ${isActive('/settings') ? 'text-cycle-primary font-medium' : ''}`}
             >
@@ -78,7 +84,7 @@ const Navbar: React.FC = () => {
 
       {/* Mobile bottom navigation */}
       <div className="fixed md:hidden bottom-0 left-0 right-0 bg-white shadow-[0_-1px_3px_rgba(0,0,0,0.1)] z-50">
-        <div className="grid grid-cols-5 py-2">
+        <div className="grid grid-cols-6 py-2">
           <Link 
             to="/" 
             className={`flex flex-col items-center justify-center ${isActive('/') ? 'text-cycle-primary' : 'text-gray-500'}`}
@@ -96,6 +102,14 @@ const Navbar: React.FC = () => {
           </Link>
           
           <Link 
+            to="/insights" 
+            className={`flex flex-col items-center justify-center ${isActive('/insights') ? 'text-cycle-primary' : 'text-gray-500'}`}
+          >
+            <LineChartIcon size={20} />
+            <span className="text-xs mt-1">Insights</span>
+          </Link>
+          
+          <Link 
             to="/track" 
             className="flex flex-col items-center justify-center"
           >
@@ -108,11 +122,11 @@ const Navbar: React.FC = () => {
           </Link>
           
           <Link 
-            to="/insights" 
-            className={`flex flex-col items-center justify-center ${isActive('/insights') ? 'text-cycle-primary' : 'text-gray-500'}`}
+            to="/milestones" 
+            className={`flex flex-col items-center justify-center ${isActive('/milestones') ? 'text-cycle-primary' : 'text-gray-500'}`}
           >
-            <LineChartIcon size={20} />
-            <span className="text-xs mt-1">Insights</span>
+            <Flag size={20} />
+            <span className="text-xs mt-1">Milestones</span>
           </Link>
           
           <Link 
