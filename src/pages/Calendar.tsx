@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, differenceInDays } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, differenceInDays, startOfWeek, endOfWeek, addDays } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,27 +23,22 @@ const Calendar: React.FC = () => {
   
   const { cycleDays, cycles, currentCycleId, addCycleDay, updateCycleDay, deleteCycleDay } = useAppStore();
   
-  // Get days in current month
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
   
-  // Get current cycle and predictions
   const currentCycle = cycles.find(cycle => cycle.id === currentCycleId);
   const predictions = currentCycle?.predictions;
   
-  // Navigation functions
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
   
-  // Get cycle data for a specific date
   const getCycleDataForDate = (date: Date) => {
     return cycleDays.find(day => 
       isSameDay(new Date(day.date), date)
     );
   };
   
-  // Get phase for a specific date
   const getPhaseForDate = (date: Date): CyclePhase | undefined => {
     if (!currentCycle?.predictions?.phases) return undefined;
     
@@ -59,14 +54,12 @@ const Calendar: React.FC = () => {
     return undefined;
   };
   
-  // Handle day click
   const handleDayClick = (day: Date) => {
     const exactDay = new Date(day.getTime());
     setSelectedDate(exactDay);
     
     const cycleData = getCycleDataForDate(exactDay);
     
-    // Initialize edit state
     setEditFlow(cycleData?.flow);
     setEditSymptoms(cycleData?.symptoms || []);
     setEditNotes(cycleData?.notes || '');
@@ -75,12 +68,10 @@ const Calendar: React.FC = () => {
     setIsDialogOpen(true);
   };
   
-  // Handle edit
   const handleEdit = () => {
     setIsEditMode(true);
   };
   
-  // Handle save
   const handleSave = () => {
     if (!selectedDate) return;
     
@@ -107,7 +98,6 @@ const Calendar: React.FC = () => {
     setIsEditMode(false);
   };
   
-  // Handle delete
   const handleDelete = () => {
     if (!selectedDate) return;
     
@@ -120,7 +110,6 @@ const Calendar: React.FC = () => {
     }
   };
   
-  // Toggle symptom selection
   const toggleSymptom = (symptom: Symptom) => {
     if (editSymptoms.includes(symptom)) {
       setEditSymptoms(editSymptoms.filter(s => s !== symptom));
@@ -129,7 +118,6 @@ const Calendar: React.FC = () => {
     }
   };
   
-  // Get flow level color
   const getFlowLevelColor = (level: FlowLevel) => {
     switch (level) {
       case FlowLevel.SPOTTING:
@@ -164,16 +152,13 @@ const Calendar: React.FC = () => {
     }
   };
   
-  // Format symptom name
   const formatSymptomName = (symptom: Symptom) => {
     return symptom.replace('_', ' ');
   };
   
-  // Next period info
   const nextPeriodStart = predictions?.nextPeriodStart ? new Date(predictions.nextPeriodStart) : undefined;
   const daysUntilNextPeriod = nextPeriodStart ? differenceInDays(nextPeriodStart, new Date()) : undefined;
   
-  // Current cycle day
   const firstPeriodDay = cycleDays
     .filter(day => day.flow)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
@@ -214,6 +199,8 @@ const Calendar: React.FC = () => {
         }
         
         const currentDay = new Date(day.getTime());
+        const isCurrentMonth = isSameMonth(currentDay, monthStart);
+        const isToday = isSameDay(currentDay, new Date());
         
         days.push(
           <div 
@@ -243,7 +230,6 @@ const Calendar: React.FC = () => {
               )}
             </div>
             
-            {/* Day content */}
             <div className="mt-1 flex flex-col gap-1">
               {cycleDay?.symptoms && cycleDay.symptoms.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-1">
@@ -266,7 +252,6 @@ const Calendar: React.FC = () => {
                 </div>
               )}
               
-              {/* Special days indicators */}
               {predictions?.nextPeriodStart && isSameDay(currentDay, new Date(predictions.nextPeriodStart)) && (
                 <div className="absolute bottom-1 left-1 right-1">
                   <Badge className="w-full justify-center bg-phase-menstrual hover:bg-phase-menstrual text-white">
@@ -290,7 +275,7 @@ const Calendar: React.FC = () => {
       }
       
       rows.push(
-        <div key={day.toString()} className="grid grid-cols-7">
+        <div key={day.toString()} className="grid grid-cols-7 gap-1">
           {days}
         </div>
       );
@@ -327,7 +312,6 @@ const Calendar: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Calendar header */}
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
                   <div key={day} className="text-center font-medium text-sm py-2">
@@ -336,10 +320,8 @@ const Calendar: React.FC = () => {
                 ))}
               </div>
               
-              {/* Calendar grid */}
               {renderCells()}
               
-              {/* Legend */}
               <div className="mt-6 flex flex-wrap gap-4 text-xs">
                 <div className="flex items-center">
                   <div className="w-3 h-3 rounded-full bg-phase-menstrual mr-1"></div>
@@ -400,7 +382,6 @@ const Calendar: React.FC = () => {
                   </span>
                 </div>
                 
-                {/* Calendar with highlighted days */}
                 <div className="mt-4 pt-4 border-t">
                   <h3 className="font-medium mb-2">Upcoming Events</h3>
                   <CalendarComponent 
@@ -425,7 +406,6 @@ const Calendar: React.FC = () => {
           </Card>
         </div>
         
-        {/* Day Detail Dialog */}
         {selectedDate && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent className="max-w-md">
@@ -486,7 +466,6 @@ const Calendar: React.FC = () => {
                     
                     return (
                       <div className="space-y-4">
-                        {/* Phase info */}
                         {phase && (
                           <div className="flex items-center gap-2">
                             <div className={`w-4 h-4 rounded-full ${getPhaseColor(phase).replace('bg-', 'bg-')}`} />
@@ -562,7 +541,6 @@ const Calendar: React.FC = () => {
                           </div>
                         )}
                         
-                        {/* Show edit button if there's data */}
                         {cycleData && (
                           <div className="flex justify-end">
                             <Button onClick={handleEdit} variant="outline" className="flex items-center gap-1">
