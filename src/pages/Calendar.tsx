@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, differenceInDays } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -148,19 +147,18 @@ const Calendar: React.FC = () => {
     }
   };
   
-  // Get phase color
   const getPhaseColor = (phase?: CyclePhase) => {
     if (!phase) return '';
     
     switch (phase) {
       case CyclePhase.MENSTRUAL:
-        return 'text-phase-menstrual';
+        return 'bg-phase-menstrual/30';
       case CyclePhase.FOLLICULAR:
-        return 'text-phase-follicular';
+        return 'bg-phase-follicular/30';
       case CyclePhase.OVULATION:
-        return 'text-phase-ovulation';
+        return 'bg-phase-ovulation/30';
       case CyclePhase.LUTEAL:
-        return 'text-phase-luteal';
+        return 'bg-phase-luteal/30';
       default:
         return '';
     }
@@ -183,6 +181,125 @@ const Calendar: React.FC = () => {
   const currentCycleDay = firstPeriodDay 
     ? differenceInDays(new Date(), new Date(firstPeriodDay.date)) + 1 
     : undefined;
+  
+  const renderCells = () => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
+    const startDate = startOfWeek(monthStart);
+    const endDate = endOfWeek(monthEnd);
+    
+    const rows = [];
+    let days = [];
+    let day = startDate;
+    
+    const currentCycle = cycles && currentCycleId ? cycles.find(cycle => cycle.id === currentCycleId) : undefined;
+    
+    while (day <= endDate) {
+      for (let i = 0; i < 7; i++) {
+        const cycleDay = cycleDays.find(cDay => 
+          isSameDay(new Date(cDay.date), day)
+        );
+        
+        let phase: CyclePhase | undefined;
+        if (currentCycle?.predictions?.phases) {
+          for (const phasePrediction of currentCycle.predictions.phases) {
+            const phaseStart = new Date(phasePrediction.startDate);
+            const phaseEnd = new Date(phasePrediction.endDate);
+            
+            if (day >= phaseStart && day <= phaseEnd) {
+              phase = phasePrediction.phase;
+              break;
+            }
+          }
+        }
+        
+        const currentDay = new Date(day.getTime());
+        
+        days.push(
+          <div 
+            key={currentDay.toString()} 
+            className={`h-24 p-2 rounded-md border relative cursor-pointer transition-colors hover:bg-gray-50 ${
+              isToday ? 'border-cycle-primary' : 'border-gray-200'
+            } ${!cycleDay?.flow && phase ? getPhaseColor(phase) : ''}`}
+            onClick={() => handleDayClick(currentDay)}
+          >
+            <div className="flex justify-between items-start">
+              <span className={`text-sm font-medium ${isToday ? 'text-cycle-primary' : ''}`}>
+                {format(currentDay, 'd')}
+              </span>
+              
+              {(cycleDay || phase) && (
+                <div className="flex items-center space-x-1">
+                  {cycleDay?.flow && (
+                    <div className={`w-3 h-3 rounded-full ${getFlowLevelColor(cycleDay.flow)}`}></div>
+                  )}
+                  
+                  {phase && !cycleDay?.flow && (
+                    <div className={`text-xs font-medium text-white bg-black/40 px-1 rounded`}>
+                      {phase.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            {/* Day content */}
+            <div className="mt-1 flex flex-col gap-1">
+              {cycleDay?.symptoms && cycleDay.symptoms.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {cycleDay.symptoms.slice(0, 2).map((symptom) => (
+                    <Badge key={symptom} variant="outline" className="text-xs px-1 py-0 bg-white/80">
+                      {formatSymptomName(symptom)}
+                    </Badge>
+                  ))}
+                  {cycleDay.symptoms.length > 2 && (
+                    <Badge variant="outline" className="text-xs px-1 py-0 bg-white/80">
+                      +{cycleDay.symptoms.length - 2}
+                    </Badge>
+                  )}
+                </div>
+              )}
+              
+              {cycleDay?.notes && (
+                <div className="mt-1 text-xs text-gray-700 truncate bg-white/80 px-1 rounded">
+                  {cycleDay.notes.length > 20 ? cycleDay.notes.substring(0, 20) + '...' : cycleDay.notes}
+                </div>
+              )}
+              
+              {/* Special days indicators */}
+              {predictions?.nextPeriodStart && isSameDay(currentDay, new Date(predictions.nextPeriodStart)) && (
+                <div className="absolute bottom-1 left-1 right-1">
+                  <Badge className="w-full justify-center bg-phase-menstrual hover:bg-phase-menstrual text-white">
+                    Next Period
+                  </Badge>
+                </div>
+              )}
+              
+              {predictions?.nextOvulationDate && isSameDay(currentDay, new Date(predictions.nextOvulationDate)) && (
+                <div className="absolute bottom-1 left-1 right-1">
+                  <Badge className="w-full justify-center bg-phase-ovulation hover:bg-phase-ovulation text-black">
+                    Ovulation
+                  </Badge>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+        
+        day = addDays(day, 1);
+      }
+      
+      rows.push(
+        <div key={day.toString()} className="grid grid-cols-7">
+          {days}
+        </div>
+      );
+      
+      days = [];
+    }
+    
+    return <div className="bg-white rounded-lg overflow-hidden">{rows}</div>;
+  };
   
   return (
     <Layout>
@@ -220,90 +337,7 @@ const Calendar: React.FC = () => {
               </div>
               
               {/* Calendar grid */}
-              <div className="grid grid-cols-7 gap-1">
-                {Array(monthStart.getDay()).fill(null).map((_, index) => (
-                  <div key={`empty-start-${index}`} className="h-24 p-1 bg-gray-50 rounded-md"></div>
-                ))}
-                
-                {monthDays.map((day) => {
-                  const cycleData = getCycleDataForDate(day);
-                  const isToday = isSameDay(day, new Date());
-                  const phase = getPhaseForDate(day);
-                  const phaseColor = getPhaseColor(phase);
-                  
-                  return (
-                    <div 
-                      key={day.toString()} 
-                      className={`h-24 p-2 rounded-md border relative cursor-pointer transition-colors hover:bg-gray-50 ${
-                        isToday ? 'border-cycle-primary' : 'border-gray-200'
-                      } ${!cycleData?.flow && phase ? `${phaseColor.replace('text-', 'bg-')}/10` : ''}`}
-                      onClick={() => handleDayClick(day)}
-                    >
-                      <div className="flex justify-between items-start">
-                        <span className={`text-sm font-medium ${isToday ? 'text-cycle-primary' : ''}`}>
-                          {format(day, 'd')}
-                        </span>
-                        
-                        {(cycleData || phase) && (
-                          <div className="flex items-center space-x-1">
-                            {cycleData?.flow && (
-                              <div className={`w-3 h-3 rounded-full ${getFlowLevelColor(cycleData.flow)}`}></div>
-                            )}
-                            
-                            {phase && !cycleData?.flow && (
-                              <div className={`text-xs font-medium ${phaseColor}`}>{phase.charAt(0).toUpperCase()}</div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="mt-1 flex flex-col gap-1">
-                        {cycleData?.symptoms && cycleData.symptoms.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {cycleData.symptoms.slice(0, 2).map((symptom) => (
-                              <Badge key={symptom} variant="outline" className="text-xs px-1 py-0">
-                                {formatSymptomName(symptom)}
-                              </Badge>
-                            ))}
-                            {cycleData.symptoms.length > 2 && (
-                              <Badge variant="outline" className="text-xs px-1 py-0">
-                                +{cycleData.symptoms.length - 2}
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-                        
-                        {cycleData?.notes && (
-                          <div className="mt-1 text-xs text-gray-500 truncate">
-                            {cycleData.notes.length > 20 ? cycleData.notes.substring(0, 20) + '...' : cycleData.notes}
-                          </div>
-                        )}
-                        
-                        {/* Special days indicators */}
-                        {predictions?.nextPeriodStart && isSameDay(day, new Date(predictions.nextPeriodStart)) && (
-                          <div className="absolute bottom-1 left-1 right-1">
-                            <Badge className="w-full justify-center bg-phase-menstrual hover:bg-phase-menstrual text-white">
-                              Next Period
-                            </Badge>
-                          </div>
-                        )}
-                        
-                        {predictions?.nextOvulationDate && isSameDay(day, new Date(predictions.nextOvulationDate)) && (
-                          <div className="absolute bottom-1 left-1 right-1">
-                            <Badge className="w-full justify-center bg-phase-ovulation hover:bg-phase-ovulation text-white">
-                              Ovulation
-                            </Badge>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-                
-                {Array(6 - monthEnd.getDay()).fill(null).map((_, index) => (
-                  <div key={`empty-end-${index}`} className="h-24 p-1 bg-gray-50 rounded-md"></div>
-                ))}
-              </div>
+              {renderCells()}
               
               {/* Legend */}
               <div className="mt-6 flex flex-wrap gap-4 text-xs">
@@ -455,7 +489,7 @@ const Calendar: React.FC = () => {
                         {/* Phase info */}
                         {phase && (
                           <div className="flex items-center gap-2">
-                            <div className={`w-4 h-4 rounded-full ${getPhaseColor(phase).replace('text-', 'bg-')}`} />
+                            <div className={`w-4 h-4 rounded-full ${getPhaseColor(phase).replace('bg-', 'bg-')}`} />
                             <div>
                               <h3 className="font-medium">Phase</h3>
                               <p className="capitalize">{phase}</p>
