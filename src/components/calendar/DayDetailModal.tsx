@@ -1,14 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { CycleDay, FlowLevel, Symptom, Mood } from '@/types';
-import { X, Trash2, ChevronDown, Edit, Save, XCircle } from 'lucide-react';
+import { X, Trash2, ChevronDown, Edit, Save, XCircle, SmileIcon } from 'lucide-react';
 
 interface DayDetailModalProps {
   date: Date;
   cycleDay?: CycleDay;
   onClose: () => void;
-  onSave: (date: Date, data: { flow?: FlowLevel, symptoms?: Symptom[], notes?: string }) => void;
+  onSave: (date: Date, data: { flow?: FlowLevel, symptoms?: Symptom[], mood?: Mood, notes?: string }) => void;
   onDelete: (date: Date) => void;
 }
 
@@ -19,16 +18,15 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
   onSave,
   onDelete
 }) => {
-  // Ensure date is properly initialized as a Date object
   const modalDate = date instanceof Date ? date : new Date(date);
   
   const [flow, setFlow] = useState<FlowLevel | undefined>(cycleDay?.flow);
   const [symptoms, setSymptoms] = useState<Symptom[]>(cycleDay?.symptoms || []);
+  const [mood, setMood] = useState<Mood | undefined>(cycleDay?.mood);
   const [notes, setNotes] = useState<string>(cycleDay?.notes || '');
   const [showPreviousEntries, setShowPreviousEntries] = useState<boolean>(false);
   const [editMode, setEditMode] = useState<boolean>(!cycleDay);
   
-  // Handle outside click to close
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -42,7 +40,7 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
   }, [onClose]);
   
   const handleSave = () => {
-    onSave(modalDate, { flow, symptoms, notes });
+    onSave(modalDate, { flow, symptoms, mood, notes });
     setEditMode(false);
   };
   
@@ -55,6 +53,25 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
       setSymptoms(symptoms.filter(s => s !== symptom));
     } else {
       setSymptoms([...symptoms, symptom]);
+    }
+  };
+  
+  const getMoodColor = (selectedMood: Mood) => {
+    switch (selectedMood) {
+      case Mood.HAPPY:
+        return 'bg-green-500 text-white border-green-500';
+      case Mood.EXCITED:
+        return 'bg-yellow-500 text-white border-yellow-500';
+      case Mood.CALM:
+        return 'bg-blue-500 text-white border-blue-500';
+      case Mood.SAD:
+        return 'bg-indigo-500 text-white border-indigo-500';
+      case Mood.STRESSED:
+        return 'bg-red-500 text-white border-red-500';
+      case Mood.ANXIOUS:
+        return 'bg-purple-500 text-white border-purple-500';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
   
@@ -96,7 +113,6 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
           </div>
         </div>
         
-        {/* Previous entries dropdown */}
         {cycleDay && (
           <div className="p-4 border-b">
             <button
@@ -150,6 +166,16 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
                 </div>
               )}
               
+              {cycleDay?.mood && (
+                <div className="flex items-center gap-2">
+                  <SmileIcon className="text-yellow-500" />
+                  <div>
+                    <h3 className="font-medium">Mood</h3>
+                    <p className="capitalize">{cycleDay.mood.toLowerCase().replace('_', ' ')}</p>
+                  </div>
+                </div>
+              )}
+              
               {notes && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Notes</h4>
@@ -170,7 +196,7 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
               </div>
             </div>
           ) : (
-            <div>
+            <div className="space-y-4">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Period flow</label>
                 <div className="grid grid-cols-5 gap-2">
@@ -196,6 +222,23 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
                       onClick={() => toggleSymptom(symptom)}
                     >
                       {symptom.charAt(0).toUpperCase() + symptom.slice(1).replace('_', ' ')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mood</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {Object.values(Mood).map(moodOption => (
+                    <button
+                      key={moodOption}
+                      className={`py-2 px-3 rounded-md text-xs font-medium border ${
+                        mood === moodOption ? getMoodColor(moodOption) : 'bg-gray-100 text-gray-800'
+                      }`}
+                      onClick={() => setMood(mood === moodOption ? undefined : moodOption)}
+                    >
+                      {moodOption.toLowerCase().replace('_', ' ')}
                     </button>
                   ))}
                 </div>
