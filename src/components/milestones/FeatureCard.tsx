@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Settings, Lock, Activity, Calendar } from "lucide-react";
 import { LifeStageFeature } from '@/types';
 import { LucideIcon } from 'lucide-react';
+import { ParentGuardianShare } from '@/components/milestones/ParentGuardianShare';
 
 interface FeatureCardProps {
   feature: {
