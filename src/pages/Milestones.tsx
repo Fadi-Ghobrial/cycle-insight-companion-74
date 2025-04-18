@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +9,11 @@ import { FeatureCard } from '@/components/milestones/FeatureCard';
 import { CrossModeDesign } from '@/components/milestones/CrossModeDesign';
 import { 
   Book, Heart, BabyIcon, FlameIcon, 
-  ThermometerIcon, Sparkles
+  ThermometerIcon, Sparkles, 
+  BarChart, Lightbulb, LineChart, PlusCircle,
+  Calendar, CalendarCheck, Activity, Brain,
+  Clock, Microscope, Thermometer, Pill,
+  Lock
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { useToast } from '@/components/ui/use-toast';
