@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, addMonths, subMonths, differenceInDays } from 'date-fns';
 import { ChevronLeft, ChevronRight, RotateCcw, Undo2, RefreshCw, Info } from 'lucide-react';
 import { CycleDay, FlowLevel, Cycle, CyclePhase } from '@/types';
@@ -28,6 +28,20 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     reset,
     user
   } = useAppStore();
+  
+  useEffect(() => {
+    const handleOpenDayDetail = (event: CustomEvent) => {
+      const { date } = event.detail;
+      setSelectedDate(new Date(date));
+      setShowDayDetail(true);
+    };
+    
+    document.addEventListener('open-day-detail', handleOpenDayDetail as EventListener);
+    
+    return () => {
+      document.removeEventListener('open-day-detail', handleOpenDayDetail as EventListener);
+    };
+  }, []);
   
   const nextMonth = () => {
     setCurrentMonth(addMonths(currentMonth, 1));

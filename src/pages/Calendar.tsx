@@ -8,21 +8,11 @@ import { Calendar as CalendarUI } from '@/components/ui/calendar';
 import { useAppStore } from '@/lib/store';
 import { FlowLevel } from '@/types';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import Calendar from '@/components/calendar/Calendar';
 
-const Calendar: React.FC = () => {
+const CalendarPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { addCycleDay, cycleDays, user } = useAppStore();
-
-  const handleAddDay = () => {
-    addCycleDay({
-      date: selectedDate,
-      flow: FlowLevel.MEDIUM,
-      symptoms: [],
-      moods: [], // Added moods array
-      notes: "",
-      userId: user?.id || 'guest'
-    });
-  };
 
   // Find cycle day data for the selected date
   const selectedCycleDay = cycleDays.find(day => 
@@ -34,29 +24,18 @@ const Calendar: React.FC = () => {
       <div className="container mx-auto py-6 px-4">
         <h1 className="text-2xl font-bold text-cycle-primary mb-6">Cycle Calendar</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Calendar</CardTitle>
-              <CardDescription>Select a date to view details</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <CalendarUI
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => date && setSelectedDate(date)}
-                className="rounded-md border"
-              />
-              <div className="flex justify-center">
-                <Button 
-                  onClick={handleAddDay}
-                  className="bg-cycle-primary hover:bg-cycle-secondary"
-                >
-                  Add Data for Selected Date
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Calendar</CardTitle>
+                <CardDescription>Track and view your cycle days</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Calendar onDayClick={(date) => setSelectedDate(date)} />
+              </CardContent>
+            </Card>
+          </div>
 
           <Card>
             <CardHeader>
@@ -67,7 +46,24 @@ const Calendar: React.FC = () => {
             </CardHeader>
             <CardContent>
               {!selectedCycleDay ? (
-                <p className="text-center py-12 text-gray-500">No data available. Please add a cycle day.</p>
+                <div className="text-center py-12 text-gray-500">
+                  <p className="mb-4">No data available for this date.</p>
+                  <Button 
+                    className="bg-cycle-primary hover:bg-cycle-secondary"
+                    onClick={() => {
+                      const dayDetailModal = document.createElement('div');
+                      dayDetailModal.id = 'day-detail-modal';
+                      document.body.appendChild(dayDetailModal);
+                      
+                      const event = new CustomEvent('open-day-detail', {
+                        detail: { date: selectedDate }
+                      });
+                      document.dispatchEvent(event);
+                    }}
+                  >
+                    Add Data for This Date
+                  </Button>
+                </div>
               ) : (
                 <ScrollArea className="h-[300px] w-full rounded-md border p-4">
                   <div className="mb-4">
@@ -79,6 +75,17 @@ const Calendar: React.FC = () => {
                     <p className="py-1">Moods: {selectedCycleDay.moods.join(', ') || 'None'}</p>
                     <p className="py-1">Notes: {selectedCycleDay.notes || 'None'}</p>
                   </div>
+                  <Button 
+                    className="mt-4 bg-cycle-primary hover:bg-cycle-secondary"
+                    onClick={() => {
+                      const event = new CustomEvent('open-day-detail', {
+                        detail: { date: selectedDate }
+                      });
+                      document.dispatchEvent(event);
+                    }}
+                  >
+                    Edit Data
+                  </Button>
                 </ScrollArea>
               )}
             </CardContent>
@@ -89,4 +96,4 @@ const Calendar: React.FC = () => {
   );
 };
 
-export default Calendar;
+export default CalendarPage;
