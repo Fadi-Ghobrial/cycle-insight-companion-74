@@ -1,4 +1,4 @@
-import { CycleDay, CyclePrediction, CyclePhase, PhasePrediction, Symptom } from '@/types';
+import { CycleDay, CyclePrediction, CyclePhase, PhasePrediction, Symptom, LifeStage } from '@/types';
 import { addDays, differenceInDays, subDays } from 'date-fns';
 import * as tf from '@tensorflow/tfjs';
 
@@ -8,12 +8,49 @@ const AVERAGE_PERIOD_LENGTH = 5;
 const AVERAGE_OVULATION_DAY = 14;
 const FERTILE_WINDOW_LENGTH = 6; // 5 days before ovulation and the day of ovulation
 
+// Life stage specific prediction settings
+const LIFE_STAGE_SETTINGS = {
+  [LifeStage.FIRST_PERIOD]: {
+    confidenceMultiplier: 0.7, // Lower confidence for first period
+    cycleLengthVariance: 5,   // Wider variance for predictions
+    periodLengthVariance: 2
+  },
+  [LifeStage.STANDARD]: {
+    confidenceMultiplier: 1.0,
+    cycleLengthVariance: 2,
+    periodLengthVariance: 1
+  },
+  [LifeStage.TTC]: {
+    confidenceMultiplier: 1.2, // Higher confidence for TTC (more precise)
+    cycleLengthVariance: 1,
+    periodLengthVariance: 1,
+    fertilityFocused: true
+  },
+  [LifeStage.PERIMENOPAUSE]: {
+    confidenceMultiplier: 0.8, // Lower confidence for perimenopause
+    cycleLengthVariance: 7,    // Much wider variance
+    periodLengthVariance: 3
+  },
+  [LifeStage.NO_PERIOD]: {
+    disabled: true  // No predictions for no-period mode
+  },
+  [LifeStage.PREGNANCY]: {
+    disabled: true  // No cycle predictions during pregnancy
+  }
+};
+
 /**
- * Simple prediction model for cycle phases
+ * Simple prediction model for cycle phases that takes life stage into account
  */
-export function predictCycle(cycleDays: CycleDay[]): CyclePrediction {
+export function predictCycle(cycleDays: CycleDay[], lifeStage: LifeStage = LifeStage.STANDARD): CyclePrediction | null {
+  // Check if predictions should be disabled for this life stage
+  const stageSettings = LIFE_STAGE_SETTINGS[lifeStage];
+  if (stageSettings?.disabled) {
+    return null;
+  }
+
   if (cycleDays.length === 0) {
-    return createDefaultPrediction(new Date());
+    return createDefaultPrediction(new Date(), lifeStage);
   }
 
   // Sort days by date
@@ -25,7 +62,7 @@ export function predictCycle(cycleDays: CycleDay[]): CyclePrediction {
   const flowDays = sortedDays.filter((day) => day.flow);
   
   if (flowDays.length === 0) {
-    return createDefaultPrediction(new Date());
+    return createDefaultPrediction(new Date(), lifeStage);
   }
 
   // Find period start dates
@@ -45,17 +82,19 @@ export function predictCycle(cycleDays: CycleDay[]): CyclePrediction {
 
   // If we have at least 2 periods, calculate the average cycle length
   if (periodStartDates.length >= 2) {
-    return predictUsingHistoricalData(periodStartDates, flowDays);
+    return predictUsingHistoricalData(periodStartDates, flowDays, lifeStage);
   }
 
   // Otherwise, use the most recent period and default values
-  return createDefaultPrediction(periodStartDates[periodStartDates.length - 1]);
+  return createDefaultPrediction(periodStartDates[periodStartDates.length - 1], lifeStage);
 }
 
 /**
  * Predict cycle using historical period data
  */
-function predictUsingHistoricalData(periodStartDates: Date[], flowDays: CycleDay[]): CyclePrediction {
+function predictUsingHistoricalData(periodStartDates: Date[], flowDays: CycleDay[], lifeStage: LifeStage): CyclePrediction {
+  const stageSettings = LIFE_STAGE_SETTINGS[lifeStage];
+  
   // Calculate average cycle length from historical data
   let totalCycleLength = 0;
   for (let i = 1; i < periodStartDates.length; i++) {
@@ -116,8 +155,9 @@ function predictUsingHistoricalData(periodStartDates: Date[], flowDays: CycleDay
     }
   ];
   
-  // Calculate confidence based on number of historical cycles
-  const confidence = Math.min(0.5 + (periodStartDates.length * 0.05), 0.95);
+  // Calculate confidence based on number of historical cycles and life stage
+  const baseConfidence = Math.min(0.5 + (periodStartDates.length * 0.05), 0.95);
+  const confidence = Math.min(baseConfidence * (stageSettings?.confidenceMultiplier || 1.0), 0.95);
   
   return {
     nextPeriodStart,
@@ -133,10 +173,20 @@ function predictUsingHistoricalData(periodStartDates: Date[], flowDays: CycleDay
 /**
  * Create default prediction using average cycle values
  */
-function createDefaultPrediction(startDate: Date): CyclePrediction {
-  const nextPeriodStart = addDays(startDate, AVERAGE_CYCLE_LENGTH);
-  const nextPeriodEnd = addDays(nextPeriodStart, AVERAGE_PERIOD_LENGTH - 1);
-  const nextOvulationDate = addDays(nextPeriodStart, -AVERAGE_CYCLE_LENGTH + AVERAGE_OVULATION_DAY);
+function createDefaultPrediction(startDate: Date, lifeStage: LifeStage): CyclePrediction {
+  const stageSettings = LIFE_STAGE_SETTINGS[lifeStage];
+  
+  // Add variance based on life stage
+  const cycleVariance = stageSettings?.cycleLengthVariance || 0;
+  const periodVariance = stageSettings?.periodLengthVariance || 0;
+  
+  // For first period, use wider prediction windows
+  const cycleLength = AVERAGE_CYCLE_LENGTH + (Math.random() * cycleVariance * 2 - cycleVariance);
+  const periodLength = AVERAGE_PERIOD_LENGTH + (Math.random() * periodVariance * 2 - periodVariance);
+  
+  const nextPeriodStart = addDays(startDate, Math.round(cycleLength));
+  const nextPeriodEnd = addDays(nextPeriodStart, Math.round(periodLength) - 1);
+  const nextOvulationDate = addDays(nextPeriodStart, -Math.round(cycleLength / 2));
   const nextFertileWindowStart = addDays(nextOvulationDate, -5);
   const nextFertileWindowEnd = nextOvulationDate;
   
@@ -168,13 +218,17 @@ function createDefaultPrediction(startDate: Date): CyclePrediction {
     }
   ];
   
+  // Lower confidence for first-time predictions and adjust based on life stage
+  const baseConfidence = 0.5;
+  const confidence = baseConfidence * (stageSettings?.confidenceMultiplier || 1.0);
+  
   return {
     nextPeriodStart,
     nextPeriodEnd,
     nextFertileWindowStart,
     nextFertileWindowEnd,
     nextOvulationDate,
-    confidence: 0.5, // Default confidence is low
+    confidence,
     phases
   };
 }

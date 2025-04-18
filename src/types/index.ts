@@ -26,6 +26,19 @@ export interface LifeStageChange {
   reason?: string;
 }
 
+// Life Stage Feature types
+export interface LifeStageFeature {
+  id: string;
+  title: string;
+  description: string;
+  enabled: boolean;
+  lifeStage: LifeStage;
+  type: 'ui' | 'algorithm';
+  implementationStatus: 'planned' | 'in_progress' | 'completed';
+  usageCount?: number;
+  lastUsed?: Date;
+}
+
 // Period tracking types
 export interface CycleDay {
   id: string;
@@ -209,4 +222,120 @@ export enum ArticleCategory {
   WELLNESS = 'wellness_and_lifestyle',
   MYTHS = 'myths_and_facts',
   SCIENCE = 'science_and_research'
+}
+
+// First Period specific types
+export interface ConfidenceMeter {
+  id: string;
+  userId: string;
+  consecutiveCyclesLogged: number;
+  confidenceLevel: number; // 0-100
+  lastUpdated: Date;
+}
+
+export interface EducationalContent {
+  id: string;
+  title: string;
+  content: string;
+  mediaUrl?: string;
+  type: 'carousel' | 'article' | 'video';
+  lifeStage: LifeStage;
+  completed: boolean;
+}
+
+// TTC specific types
+export interface FertilityData {
+  id: string;
+  userId: string;
+  cycleId: string;
+  ovulationTestResult?: LHTestResult;
+  basalTemperature?: number;
+  cervicalMucus?: CervicalMucus;
+  intercourseLogged?: boolean;
+  date: Date;
+  notes?: string;
+}
+
+export enum CervicalMucus {
+  DRY = 'dry',
+  STICKY = 'sticky',
+  CREAMY = 'creamy',
+  WATERY = 'watery',
+  EGG_WHITE = 'egg_white'
+}
+
+// Pregnancy specific types
+export interface PregnancyData {
+  id: string;
+  userId: string;
+  gestationalAge: number; // in days
+  dueDate: Date;
+  lastUpdated: Date;
+  symptoms: PregnancySymptom[];
+  kickCounts?: KickCount[];
+  checklistItems: ChecklistItem[];
+}
+
+export interface KickCount {
+  id: string;
+  userId: string;
+  date: Date;
+  startTime: Date;
+  endTime?: Date;
+  count: number;
+  duration?: number; // in minutes
+}
+
+export interface ChecklistItem {
+  id: string;
+  title: string;
+  description?: string;
+  completed: boolean;
+  dueDate?: Date;
+  category: 'prenatal_visit' | 'test' | 'preparation' | 'other';
+}
+
+export enum PregnancySymptom {
+  NAUSEA = 'nausea',
+  FATIGUE = 'fatigue',
+  BREAST_TENDERNESS = 'breast_tenderness',
+  HEADACHE = 'headache',
+  BACK_PAIN = 'back_pain',
+  SWELLING = 'swelling',
+  CONTRACTIONS = 'contractions',
+  REDUCED_MOVEMENT = 'reduced_movement'
+}
+
+// Perimenopause specific types
+export interface PerimenopausalData {
+  id: string;
+  userId: string;
+  date: Date;
+  symptoms: PerimenopausalSymptom[];
+  hormoneTherapy?: HormoneTherapy;
+  sleepQuality?: number; // 1-10
+  hrvData?: number;
+}
+
+export interface HormoneTherapy {
+  id: string;
+  userId: string;
+  medicationName: string;
+  dosage: string;
+  frequency: string;
+  startDate: Date;
+  endDate?: Date;
+  sideEffects?: string[];
+}
+
+export enum PerimenopausalSymptom {
+  HOT_FLASH = 'hot_flash',
+  NIGHT_SWEAT = 'night_sweat',
+  INSOMNIA = 'insomnia',
+  MOOD_CHANGES = 'mood_changes',
+  VAGINAL_DRYNESS = 'vaginal_dryness',
+  BRAIN_FOG = 'brain_fog',
+  REDUCED_LIBIDO = 'reduced_libido',
+  JOINT_PAIN = 'joint_pain',
+  PALPITATIONS = 'palpitations'
 }

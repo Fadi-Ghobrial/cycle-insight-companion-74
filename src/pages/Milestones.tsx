@@ -1,24 +1,41 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import { 
   Book, Heart, BabyIcon, FlameIcon, 
   ThermometerIcon, Sparkles, Calendar, 
   CalendarCheck, PlusCircle, LineChart, 
   Thermometer, Pill, Activity, Clock, Brain,
-  Microscope, BarChart, Droplets, Lightbulb
+  Microscope, BarChart, Droplets, Lightbulb,
+  Check, Settings, Lock
 } from 'lucide-react';
-import { LifeStage } from '@/types';
+import { LifeStage, LifeStageFeature } from '@/types';
 import { useAppStore } from '@/lib/store';
 import { useToast } from '@/components/ui/use-toast';
 
 const MilestonesPage: React.FC = () => {
-  const { currentLifeStage, changeLifeStage } = useAppStore();
+  const { 
+    currentLifeStage, 
+    changeLifeStage, 
+    lifeStageFeatures, 
+    getAvailableFeatures,
+    toggleFeature,
+    incrementFeatureUsage,
+    lifeStageData
+  } = useAppStore();
   const { toast } = useToast();
   const [lifecycleTab, setLifecycleTab] = useState<string>(currentLifeStage);
+  const [availableFeatures, setAvailableFeatures] = useState<LifeStageFeature[]>([]);
+
+  // Get features for the current life stage
+  useEffect(() => {
+    setAvailableFeatures(getAvailableFeatures());
+  }, [getAvailableFeatures, lifecycleTab]);
 
   const lifeStageInfo = {
     [LifeStage.FIRST_PERIOD]: {
@@ -235,6 +252,32 @@ const MilestonesPage: React.FC = () => {
     }
   };
 
+  const handleToggleFeature = (featureId: string, currentState: boolean) => {
+    toggleFeature(featureId, !currentState);
+    
+    toast({
+      title: currentState ? "Feature Disabled" : "Feature Enabled",
+      description: `The feature has been ${currentState ? "disabled" : "enabled"} successfully.`,
+      duration: 3000,
+    });
+  };
+
+  const handleUseFeature = (featureId: string, featureTitle: string) => {
+    incrementFeatureUsage(featureId);
+    
+    toast({
+      title: "Feature Used",
+      description: `You are now using the ${featureTitle} feature.`,
+      duration: 3000,
+    });
+  };
+
+  const getFeatureStatus = (id: string) => {
+    const feature = lifeStageFeatures.find(f => f.id === id);
+    if (!feature) return { enabled: false, status: 'planned' };
+    return { enabled: feature.enabled, status: feature.implementationStatus };
+  };
+
   return (
     <Layout>
       <div className="container mx-auto py-6 px-4">
@@ -277,22 +320,114 @@ const MilestonesPage: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Feature Status Section */}
                     <div className="mt-4">
                       <h4 className="font-medium mb-3">Features in this mode:</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {info.features.map((feature, index) => (
-                          <Card key={index} className="border-l-4" style={{ borderLeftColor: info.color.replace('bg-', '#').replace('text-', '#').replace('100', '300').replace('800', '500') }}>
-                            <CardContent className="p-4">
-                              <div className="flex items-start gap-3 mb-2">
-                                <feature.icon className={`${info.color} w-5 h-5`} />
-                                <h5 className="font-medium">{feature.title}</h5>
-                              </div>
-                              <p className="text-sm text-gray-600">{feature.description}</p>
-                            </CardContent>
-                          </Card>
-                        ))}
+                        {info.features.map((feature, index) => {
+                          const featureId = lifeStageFeatures
+                            .find(f => f.lifeStage === stage && f.title === feature.title)?.id;
+                          
+                          if (!featureId) return null;
+                          
+                          const { enabled, status } = getFeatureStatus(featureId);
+                          const usageCount = lifeStageFeatures
+                            .find(f => f.id === featureId)?.usageCount || 0;
+                          
+                          return (
+                            <Card key={index} className="border-l-4" style={{ borderLeftColor: info.color.replace('bg-', '#').replace('text-', '#').replace('100', '300').replace('800', '500') }}>
+                              <CardContent className="p-4">
+                                <div className="flex items-start gap-3 mb-2">
+                                  <feature.icon className={`${info.color} w-5 h-5`} />
+                                  <h5 className="font-medium">{feature.title}</h5>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-3">{feature.description}</p>
+                                
+                                <div className="flex flex-col gap-2 mt-2">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-xs text-gray-500">Status: 
+                                      <Badge variant="outline" className="ml-2">
+                                        {status === 'completed' ? (
+                                          <span className="flex items-center text-green-600">
+                                            <Check className="w-3 h-3 mr-1" /> Ready
+                                          </span>
+                                        ) : status === 'in_progress' ? (
+                                          <span className="flex items-center text-yellow-600">
+                                            <Activity className="w-3 h-3 mr-1" /> In Progress
+                                          </span>
+                                        ) : (
+                                          <span className="flex items-center text-blue-600">
+                                            <Calendar className="w-3 h-3 mr-1" /> Planned
+                                          </span>
+                                        )}
+                                      </Badge>
+                                    </span>
+                                    
+                                    <span className="text-xs text-gray-500">
+                                      Used: {usageCount} times
+                                    </span>
+                                  </div>
+                                  
+                                  {status === 'completed' && (
+                                    <div className="flex justify-between gap-2 mt-1">
+                                      <Button 
+                                        size="sm" 
+                                        variant={enabled ? "default" : "outline"}
+                                        className="text-xs w-full"
+                                        onClick={() => handleUseFeature(featureId, feature.title)}
+                                        disabled={!enabled}
+                                      >
+                                        Use Feature
+                                      </Button>
+                                      
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="text-xs"
+                                        onClick={() => handleToggleFeature(featureId, enabled)}
+                                      >
+                                        <Settings className="w-3 h-3 mr-1" />
+                                      </Button>
+                                    </div>
+                                  )}
+                                  
+                                  {status !== 'completed' && (
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      className="text-xs w-full mt-1"
+                                      disabled
+                                    >
+                                      <Lock className="w-3 h-3 mr-1" />
+                                      {status === 'in_progress' ? 'Coming Soon' : 'Planned'}
+                                    </Button>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
                       </div>
                     </div>
+
+                    {/* Special UI Elements for First Period mode */}
+                    {stage === LifeStage.FIRST_PERIOD && currentLifeStage === LifeStage.FIRST_PERIOD && (
+                      <div className="mt-4 p-4 border rounded-lg">
+                        <h4 className="font-medium mb-3">Your Period Confidence Meter</h4>
+                        <div className="mb-2">
+                          <Progress 
+                            value={lifeStageData.firstPeriod.confidenceMeter?.confidenceLevel || 0} 
+                            className="h-2 bg-pink-100"
+                          />
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          {lifeStageData.firstPeriod.confidenceMeter?.consecutiveCyclesLogged || 0} of 3 cycles logged.
+                          {lifeStageData.firstPeriod.confidenceMeter?.confidenceLevel === 100 
+                            ? " Great job! We now have a good understanding of your cycle." 
+                            : " Keep logging your period to help us understand your cycle better."}
+                        </p>
+                      </div>
+                    )}
 
                     <div className="flex justify-end mt-2">
                       {stage !== currentLifeStage && (
