@@ -1,1 +1,9 @@
+
+# This file is used to configure your Supabase project.
+# It is very similar to package.json, except with toml instead of json.
+# For configuration options, see: https://supabase.com/docs/guides/functions/config-toml
+
 project_id = "ccetkeewqfjkcvnltcfb"
+
+[functions.generate-guardian-pdf]
+verify_jwt = true
