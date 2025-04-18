@@ -110,7 +110,17 @@ const useAppStore = create<AppState>()(
         
         // Recalculate predictions based on existing cycle days
         recalculatePredictions: () => set(state => {
-          if (state.cycleDays.length === 0) return {};
+          // If there are no cycle days with flow data, clear all predictions
+          const flowDays = state.cycleDays.filter(day => day.flow);
+          if (flowDays.length === 0) {
+            return {
+              cycles: state.cycles.map(cycle => ({
+                ...cycle,
+                predictions: undefined
+              })),
+              currentCycleId: null
+            };
+          }
           
           // Sort days by date
           const sortedDays = [...state.cycleDays].sort(
@@ -124,8 +134,8 @@ const useAppStore = create<AppState>()(
           let updatedCycles = [...state.cycles];
           let currentCycleId = state.currentCycleId;
           
-          // If we don't have a current cycle, create one
-          if (!currentCycleId) {
+          // If we don't have a current cycle and we have predictions, create one
+          if (!currentCycleId && predictions) {
             const newCycle: Cycle = {
               id: crypto.randomUUID(),
               startDate: new Date(),
@@ -136,7 +146,7 @@ const useAppStore = create<AppState>()(
             
             updatedCycles = [...updatedCycles, newCycle];
             currentCycleId = newCycle.id;
-          } else {
+          } else if (currentCycleId) {
             // Update existing cycle
             updatedCycles = updatedCycles.map(cycle => 
               cycle.id === currentCycleId 
