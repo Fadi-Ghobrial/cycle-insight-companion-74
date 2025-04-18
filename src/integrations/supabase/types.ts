@@ -75,6 +75,69 @@ export type Database = {
         }
         Relationships: []
       }
+      health_app_connections: {
+        Row: {
+          app_type: string
+          created_at: string | null
+          enabled: boolean | null
+          id: string
+          last_sync_at: string | null
+          sync_settings: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          app_type: string
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          last_sync_at?: string | null
+          sync_settings?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          app_type?: string
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          last_sync_at?: string | null
+          sync_settings?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      health_data_records: {
+        Row: {
+          data_type: string
+          id: string
+          recorded_at: string
+          source: string
+          synced_at: string | null
+          user_id: string
+          value: Json
+        }
+        Insert: {
+          data_type: string
+          id?: string
+          recorded_at: string
+          source: string
+          synced_at?: string | null
+          user_id: string
+          value: Json
+        }
+        Update: {
+          data_type?: string
+          id?: string
+          recorded_at?: string
+          source?: string
+          synced_at?: string | null
+          user_id?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       nurse_chat_messages: {
         Row: {
           created_at: string | null
