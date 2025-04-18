@@ -1,22 +1,21 @@
 
 import React, { useState } from 'react';
-import { Calendar as CalendarUI } from '@/components/ui/calendar';
-import { addDays, format, isSameDay, isBefore, isAfter } from 'date-fns';
-import { useAppStore } from '@/lib/store';
-import { CycleDay, FlowLevel } from '@/types';
+import { format } from 'date-fns';
 import Layout from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from '@/components/ui/button';
+import { Calendar as CalendarUI } from '@/components/ui/calendar';
+import { useAppStore } from '@/lib/store';
+import { FlowLevel } from '@/types';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Calendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { addCycleDay, cycleDays, user } = useAppStore();
 
-  const handleAddDay = (date: Date) => {
+  const handleAddDay = () => {
     addCycleDay({
-      date,
+      date: selectedDate,
       flow: FlowLevel.MEDIUM,
       symptoms: [],
       moods: [], // Added moods array
@@ -25,32 +24,10 @@ const Calendar: React.FC = () => {
     });
   };
 
-  // Custom renderer for the calendar day cells
-  const renderDayContent = (date: Date) => {
-    const day: CycleDay | undefined = cycleDays.find(day => isSameDay(new Date(day.date), date));
-
-    if (day) {
-      const dayFlow = day.flow;
-      const daySymptoms = day.symptoms;
-      const dayMoods = day.moods || [];
-
-      return (
-        <div className="flex flex-col items-center justify-center h-full">
-          {dayFlow && (
-            <Badge variant="secondary" className="mb-1">{dayFlow}</Badge>
-          )}
-          {daySymptoms && daySymptoms.length > 0 && (
-            <Badge variant="outline" className="text-purple-600">Symptoms</Badge>
-          )}
-           {dayMoods && dayMoods.length > 0 && (
-            <Badge variant="outline" className="text-blue-600">Moods</Badge>
-          )}
-        </div>
-      );
-    }
-
-    return null;
-  };
+  // Find cycle day data for the selected date
+  const selectedCycleDay = cycleDays.find(day => 
+    new Date(day.date).toDateString() === selectedDate.toDateString()
+  );
 
   return (
     <Layout requireAuth={true}>
@@ -69,12 +46,14 @@ const Calendar: React.FC = () => {
                 selected={selectedDate}
                 onSelect={(date) => date && setSelectedDate(date)}
                 className="rounded-md border"
-                components={{
-                  DayContent: ({ date }) => renderDayContent(date)
-                }}
               />
               <div className="flex justify-center">
-                <Button onClick={() => handleAddDay(selectedDate)}>Add Data for Selected Date</Button>
+                <Button 
+                  onClick={handleAddDay}
+                  className="bg-cycle-primary hover:bg-cycle-secondary"
+                >
+                  Add Data for Selected Date
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -82,26 +61,24 @@ const Calendar: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>Selected Date</CardTitle>
-              <CardDescription>Information for {selectedDate ? format(selectedDate, 'PPP') : 'No date selected'}</CardDescription>
+              <CardDescription>
+                Information for {format(selectedDate, 'MMMM dd, yyyy')}
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              {cycleDays.length === 0 ? (
-                <p>No data available. Please add a cycle day.</p>
+              {!selectedCycleDay ? (
+                <p className="text-center py-12 text-gray-500">No data available. Please add a cycle day.</p>
               ) : (
                 <ScrollArea className="h-[300px] w-full rounded-md border p-4">
-                  {cycleDays.map((day) => (
-                    isSameDay(new Date(day.date), selectedDate) && (
-                      <div key={day.id} className="mb-4">
-                        <h3 className="text-lg font-semibold">
-                          {format(new Date(day.date), 'PPP')}
-                        </h3>
-                        <p>Flow: {day.flow || 'None'}</p>
-                        <p>Symptoms: {day.symptoms.join(', ') || 'None'}</p>
-                        <p>Moods: {day.moods.join(', ') || 'None'}</p>
-                        <p>Notes: {day.notes || 'None'}</p>
-                      </div>
-                    )
-                  ))}
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold">
+                      {format(new Date(selectedCycleDay.date), 'MMMM dd, yyyy')}
+                    </h3>
+                    <p className="py-1">Flow: {selectedCycleDay.flow || 'None'}</p>
+                    <p className="py-1">Symptoms: {selectedCycleDay.symptoms.join(', ') || 'None'}</p>
+                    <p className="py-1">Moods: {selectedCycleDay.moods.join(', ') || 'None'}</p>
+                    <p className="py-1">Notes: {selectedCycleDay.notes || 'None'}</p>
+                  </div>
                 </ScrollArea>
               )}
             </CardContent>
