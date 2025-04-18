@@ -674,6 +674,51 @@ const useAppStore = create<AppState>()(
           };
         }),
         
+        // Perimenopause
+        addPerimenopausalData: (data) => set(state => ({
+          lifeStageData: {
+            ...state.lifeStageData,
+            perimenopause: {
+              ...state.lifeStageData.perimenopause,
+              perimenopausalData: [
+                ...state.lifeStageData.perimenopause.perimenopausalData,
+                {
+                  id: crypto.randomUUID(),
+                  ...data
+                }
+              ]
+            }
+          }
+        })),
+        
+        addHormoneTherapy: (therapy) => set(state => ({
+          lifeStageData: {
+            ...state.lifeStageData,
+            perimenopause: {
+              ...state.lifeStageData.perimenopause,
+              hormoneTherapies: [
+                ...state.lifeStageData.perimenopause.hormoneTherapies,
+                {
+                  id: crypto.randomUUID(),
+                  ...therapy
+                }
+              ]
+            }
+          }
+        })),
+        
+        updateHormoneTherapy: (id, updates) => set(state => ({
+          lifeStageData: {
+            ...state.lifeStageData,
+            perimenopause: {
+              ...state.lifeStageData.perimenopause,
+              hormoneTherapies: state.lifeStageData.perimenopause.hormoneTherapies.map(
+                therapy => therapy.id === id ? { ...therapy, ...updates } : therapy
+              )
+            }
+          }
+        })),
+        
         // Add a cycle day
         addCycleDay: (day) => set(state => {
           const newCycleDay = { 
