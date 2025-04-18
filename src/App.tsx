@@ -12,6 +12,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Layout from "./components/layout/Layout";
+import { AppAuthProvider } from "./lib/auth-provider";
 
 // Initialize store
 import { useAppStore } from "./lib/store";

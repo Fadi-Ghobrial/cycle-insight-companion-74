@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,6 +21,7 @@ const formatSymptomName = (name: string | number): string => {
 const Insights: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const { cycles, cycleDays, currentCycleId } = useAppStore();
+  const navigate = useNavigate();
   
   const currentCycle = cycles.find(c => c.id === currentCycleId);
   
@@ -143,6 +144,10 @@ const Insights: React.FC = () => {
   const symptomData = prepareSymptomData();
   
   const COLORS = ['#8884d8', '#83a6ed', '#8dd1e1', '#82ca9d', '#a4de6c', '#d0ed57'];
+  
+  const handleStartTracking = () => {
+    navigate('/track');
+  };
   
   return (
     <Layout requireAuth={true}>
@@ -317,7 +322,7 @@ const Insights: React.FC = () => {
                     <div className="text-center py-6">
                       <p className="text-gray-500 mb-4">No cycle predictions yet</p>
                       <Button 
-                        onClick={() => window.location.href = '/track'}
+                        onClick={handleStartTracking}
                         className="bg-cycle-primary hover:bg-cycle-secondary"
                       >
                         Start Tracking
@@ -494,7 +499,7 @@ const Insights: React.FC = () => {
                       No predictions available yet. Add more cycle data to generate predictions.
                     </p>
                     <Button 
-                      onClick={() => window.location.href = '/track'}
+                      onClick={handleStartTracking}
                       className="bg-cycle-primary hover:bg-cycle-secondary"
                     >
                       Start Tracking
