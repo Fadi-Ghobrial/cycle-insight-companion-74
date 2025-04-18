@@ -4,7 +4,7 @@ import {
   CycleDay, FlowLevel, Mood, Symptom, HealthDataSource, IoTReminder as IoTReminderType, 
   User, Cycle, CyclePrediction, LifeStage, LifeStageChange, 
   LifeStageFeature, ConfidenceMeter, EducationalContent, FertilityData,
-  PregnancyData, PerimenopausalData, HormoneTherapy
+  PregnancyData, PerimenopausalData, HormoneTherapy, KickCount
 } from '@/types';
 import { predictCycle } from './prediction';
 import { addDays } from 'date-fns';
@@ -650,6 +650,12 @@ const useAppStore = create<AppState>()(
           const pregnancyData = state.lifeStageData.pregnancy.pregnancyData;
           if (!pregnancyData || pregnancyData.id !== pregnancyId) return state;
           
+          const newKickCount: KickCount = {
+            id: crypto.randomUUID(),
+            userId: state.user?.id || 'guest',
+            ...kickCount
+          };
+          
           return {
             lifeStageData: {
               ...state.lifeStageData,
@@ -659,11 +665,7 @@ const useAppStore = create<AppState>()(
                   ...pregnancyData,
                   kickCounts: [
                     ...(pregnancyData.kickCounts || []),
-                    {
-                      id: crypto.randomUUID(),
-                      userId: state.user?.id || 'guest',
-                      ...kickCount
-                    }
+                    newKickCount
                   ],
                   lastUpdated: new Date()
                 }
@@ -671,51 +673,6 @@ const useAppStore = create<AppState>()(
             }
           };
         }),
-        
-        // Perimenopause
-        addPerimenopausalData: (data) => set(state => ({
-          lifeStageData: {
-            ...state.lifeStageData,
-            perimenopause: {
-              ...state.lifeStageData.perimenopause,
-              perimenopausalData: [
-                ...state.lifeStageData.perimenopause.perimenopausalData,
-                {
-                  id: crypto.randomUUID(),
-                  ...data
-                }
-              ]
-            }
-          }
-        })),
-        
-        addHormoneTherapy: (therapy) => set(state => ({
-          lifeStageData: {
-            ...state.lifeStageData,
-            perimenopause: {
-              ...state.lifeStageData.perimenopause,
-              hormoneTherapies: [
-                ...state.lifeStageData.perimenopause.hormoneTherapies,
-                {
-                  id: crypto.randomUUID(),
-                  ...therapy
-                }
-              ]
-            }
-          }
-        })),
-        
-        updateHormoneTherapy: (id, updates) => set(state => ({
-          lifeStageData: {
-            ...state.lifeStageData,
-            perimenopause: {
-              ...state.lifeStageData.perimenopause,
-              hormoneTherapies: state.lifeStageData.perimenopause.hormoneTherapies.map(
-                therapy => therapy.id === id ? { ...therapy, ...updates } : therapy
-              )
-            }
-          }
-        })),
         
         // Add a cycle day
         addCycleDay: (day) => set(state => {

@@ -1,3 +1,4 @@
+
 import { CycleDay, CyclePrediction, CyclePhase, PhasePrediction, Symptom, LifeStage } from '@/types';
 import { addDays, differenceInDays, subDays } from 'date-fns';
 import * as tf from '@tensorflow/tfjs';
@@ -8,8 +9,17 @@ const AVERAGE_PERIOD_LENGTH = 5;
 const AVERAGE_OVULATION_DAY = 14;
 const FERTILE_WINDOW_LENGTH = 6; // 5 days before ovulation and the day of ovulation
 
+// Define the type for the settings to avoid TypeScript errors
+type LifeStageSettingType = {
+  confidenceMultiplier?: number;
+  cycleLengthVariance?: number;
+  periodLengthVariance?: number;
+  fertilityFocused?: boolean;
+  disabled?: boolean;
+};
+
 // Life stage specific prediction settings
-const LIFE_STAGE_SETTINGS = {
+const LIFE_STAGE_SETTINGS: Record<LifeStage, LifeStageSettingType> = {
   [LifeStage.FIRST_PERIOD]: {
     confidenceMultiplier: 0.7, // Lower confidence for first period
     cycleLengthVariance: 5,   // Wider variance for predictions
