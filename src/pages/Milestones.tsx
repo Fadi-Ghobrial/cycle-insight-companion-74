@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { ConfidenceMeter } from '@/components/ui/confidence-meter';
 import { Button } from '@/components/ui/button';
 import { 
   Book, Heart, BabyIcon, FlameIcon, 
@@ -319,6 +319,13 @@ const MilestonesPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
+
+                    {/* Add Confidence Meter for First Period stage */}
+                    {stage === LifeStage.FIRST_PERIOD && currentLifeStage === LifeStage.FIRST_PERIOD && (
+                      <div className="mt-4 p-4 border rounded-lg space-y-4">
+                        <ConfidenceMeter />
+                      </div>
+                    )}
 
                     {/* Feature Status Section */}
                     <div className="mt-4">
