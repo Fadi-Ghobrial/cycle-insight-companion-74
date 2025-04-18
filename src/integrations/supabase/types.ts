@@ -9,7 +9,132 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      education_progress: {
+        Row: {
+          completed: boolean | null
+          content_id: string
+          created_at: string | null
+          id: string
+          next_available_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          content_id: string
+          created_at?: string | null
+          id?: string
+          next_available_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          content_id?: string
+          created_at?: string | null
+          id?: string
+          next_available_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      guardian_share_settings: {
+        Row: {
+          consent_verified: boolean | null
+          created_at: string | null
+          enabled: boolean | null
+          guardian_email: string | null
+          id: string
+          last_export_at: string | null
+          passcode: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          consent_verified?: boolean | null
+          created_at?: string | null
+          enabled?: boolean | null
+          guardian_email?: string | null
+          id?: string
+          last_export_at?: string | null
+          passcode?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          consent_verified?: boolean | null
+          created_at?: string | null
+          enabled?: boolean | null
+          guardian_email?: string | null
+          id?: string
+          last_export_at?: string | null
+          passcode?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      nurse_chat_messages: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_from_user: boolean
+          message: string
+          read_at: string | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_from_user: boolean
+          message: string
+          read_at?: string | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_from_user?: boolean
+          message?: string
+          read_at?: string | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      nurse_chat_sessions: {
+        Row: {
+          closed_at: string | null
+          created_at: string | null
+          id: string
+          message_count: number | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string | null
+          id?: string
+          message_count?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string | null
+          id?: string
+          message_count?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

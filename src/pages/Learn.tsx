@@ -12,6 +12,7 @@ import { ArticleCategory, LifeStage } from '@/types';
 import { articlesByCategory, featuredArticles } from '@/data/learn-content';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
+import { PeriodCarousel } from '@/components/learn/PeriodCarousel';
 
 const LearnPage: React.FC = () => {
   const { currentLifeStage } = useAppStore();
@@ -66,6 +67,13 @@ const LearnPage: React.FC = () => {
       <div className="container mx-auto py-6 px-4">
         <h1 className="text-2xl font-bold text-cycle-primary mb-6">Learn About Your Cycle</h1>
         
+        {currentLifeStage === LifeStage.FIRST_PERIOD && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Period 101</h2>
+            <PeriodCarousel />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Object.entries(categoryInfo).map(([category, info]) => (
             <Card key={category} className="hover:shadow-lg transition-shadow">
