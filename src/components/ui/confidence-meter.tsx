@@ -17,7 +17,7 @@ export function ConfidenceMeter() {
   // Count number of unique cycles with bleeding
   const bleedingCycles = new Set(
     cycleDays
-      .filter(day => day.flow !== undefined && day.flow > 0)
+      .filter(day => day.flow !== undefined && Number(day.flow) > 0)  // Convert flow to number
       .map(day => {
         const date = new Date(day.date);
         return `${date.getFullYear()}-${date.getMonth()}`; // Group by month to estimate cycles
