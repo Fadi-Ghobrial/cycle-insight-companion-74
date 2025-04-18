@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +12,7 @@ import {
   BarChart, Lightbulb, LineChart, PlusCircle,
   Calendar, CalendarCheck, Activity, Brain,
   Clock, Microscope, Thermometer, Pill,
-  Lock
+  Lock, Mail, Share2
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { useToast } from '@/components/ui/use-toast';
@@ -48,8 +47,10 @@ const lifeStageInfo = {
       },
       {
         title: "Parent/Guardian Share",
-        description: "Export a PDF of logs to a trusted adult without giving full account access",
-        icon: PlusCircle
+        description: "Export a secure, read-only PDF digest of cycles and insights to a trusted adult",
+        icon: Share2,
+        safetyFeature: true,
+        securityInfo: "Requires passcode verification and data is encrypted"
       }
     ]
   },

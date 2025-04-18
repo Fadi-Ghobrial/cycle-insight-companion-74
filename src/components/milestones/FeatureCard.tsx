@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,8 @@ interface FeatureCardProps {
     title: string;
     description: string;
     icon: LucideIcon;
+    safetyFeature?: boolean;
+    securityInfo?: string;
   };
   status: 'completed' | 'in_progress' | 'planned';
   enabled: boolean;
@@ -37,7 +38,15 @@ export const FeatureCard = ({
       <CardContent className="p-4">
         <div className="flex items-start gap-3 mb-2">
           <Icon className="w-5 h-5" />
-          <h5 className="font-medium">{feature.title}</h5>
+          <div>
+            <h5 className="font-medium">{feature.title}</h5>
+            {feature.safetyFeature && (
+              <span className="text-xs text-yellow-500 flex items-center gap-1 mt-1">
+                <Lock className="w-3 h-3" />
+                {feature.securityInfo}
+              </span>
+            )}
+          </div>
         </div>
         <p className="text-sm text-gray-600 mb-3">{feature.description}</p>
         
@@ -68,24 +77,30 @@ export const FeatureCard = ({
           
           {status === 'completed' ? (
             <div className="flex justify-between gap-2 mt-1">
-              <Button 
-                size="sm" 
-                variant={enabled ? "default" : "outline"}
-                className="text-xs w-full"
-                onClick={() => onUse()}
-                disabled={!enabled}
-              >
-                Use Feature
-              </Button>
-              
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-xs"
-                onClick={() => onToggle(!enabled)}
-              >
-                <Settings className="w-3 h-3 mr-1" />
-              </Button>
+              {feature.safetyFeature ? (
+                <ParentGuardianShare />
+              ) : (
+                <>
+                  <Button 
+                    size="sm" 
+                    variant={enabled ? "default" : "outline"}
+                    className="text-xs w-full"
+                    onClick={() => onUse()}
+                    disabled={!enabled}
+                  >
+                    Use Feature
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs"
+                    onClick={() => onToggle(!enabled)}
+                  >
+                    <Settings className="w-3 h-3 mr-1" />
+                  </Button>
+                </>
+              )}
             </div>
           ) : (
             <Button 
