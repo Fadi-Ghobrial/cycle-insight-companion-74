@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Learn from "./pages/Learn";
 import LearnCategory from "./pages/LearnCategory";
+import ArticleDetail from "./pages/ArticleDetail";
 import Layout from "./components/layout/Layout";
 import { AppAuthProvider } from "./lib/auth-provider";
 
@@ -39,6 +40,7 @@ const App = () => {
             <Route path="/insights" element={<Insights />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/learn/:category" element={<LearnCategory />} />
+            <Route path="/learn/article/:articleId" element={<ArticleDetail />} />
             <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

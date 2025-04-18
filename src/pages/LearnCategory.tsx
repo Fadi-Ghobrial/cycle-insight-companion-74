@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { ArticleCategory } from '@/types';
+import ArticleCard from '@/components/learn/ArticleCard';
+import { articlesByCategory } from '@/data/learn-content';
 
 const LearnCategory: React.FC = () => {
   const { category } = useParams<{ category: string }>();
@@ -23,34 +25,9 @@ const LearnCategory: React.FC = () => {
     [ArticleCategory.MYTHS]: "Myths & Facts",
     [ArticleCategory.SCIENCE]: "Science & Research"
   };
-  
-  // Placeholder articles - would be fetched from a database in a real app
-  const placeholderArticles = [
-    {
-      id: '1',
-      title: 'Understanding Your Menstrual Cycle Phases',
-      summary: 'A comprehensive guide to the four phases of your menstrual cycle and what to expect during each one.',
-      readTime: 5,
-      lastUpdated: new Date('2025-04-01'),
-      vetted: true
-    },
-    {
-      id: '2',
-      title: 'How Diet Affects Your Period',
-      summary: 'Learn about the connection between nutrition and menstrual health, including foods that can help alleviate symptoms.',
-      readTime: 7,
-      lastUpdated: new Date('2025-03-15'),
-      vetted: true
-    },
-    {
-      id: '3',
-      title: 'Managing PMS Symptoms Naturally',
-      summary: 'Natural approaches to managing premenstrual syndrome symptoms without medication.',
-      readTime: 4,
-      lastUpdated: new Date('2025-02-28'),
-      vetted: false
-    },
-  ];
+
+  // Get articles for this category
+  const categoryArticles = articlesByCategory[categoryEnum] || [];
   
   return (
     <Layout>
@@ -64,31 +41,24 @@ const LearnCategory: React.FC = () => {
           {categoryDisplayNames[categoryEnum] || 'Articles'}
         </h1>
         
-        <div className="grid gap-6">
-          {placeholderArticles.map(article => (
-            <Card key={article.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{article.title}</CardTitle>
-                  {article.vetted && (
-                    <Badge variant="outline" className="text-green-600">
-                      Clinically Verified
-                    </Badge>
-                  )}
-                </div>
-                <CardDescription>{article.summary}</CardDescription>
-              </CardHeader>
-              <CardFooter className="flex justify-between items-center pt-0">
-                <div className="text-sm text-gray-500">
-                  {article.readTime} min read • Last updated: {article.lastUpdated.toLocaleDateString()}
-                </div>
+        {categoryArticles.length === 0 ? (
+          <Card>
+            <CardContent className="py-8 text-center">
+              <p className="text-gray-500">No articles available in this category yet.</p>
+              <Link to="/learn" className="mt-4 inline-block">
                 <Button variant="outline" className="text-cycle-primary border-cycle-primary hover:bg-cycle-primary hover:text-white">
-                  Read Article
+                  Browse other categories
                 </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+              </Link>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-6">
+            {categoryArticles.map(article => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+        )}
       </div>
     </Layout>
   );

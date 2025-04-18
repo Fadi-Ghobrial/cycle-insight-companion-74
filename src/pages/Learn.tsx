@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Book, Brain, Heart, Leaf, ShieldCheck, Droplets } from 'lucide-react';
+import { Book, Brain, Heart, Leaf, ShieldCheck, Droplets, Clock, Calendar, CheckCircle } from 'lucide-react';
 import { ArticleCategory } from '@/types';
+import { articlesByCategory, featuredArticles } from '@/data/learn-content';
 
 const LearnPage: React.FC = () => {
   const categoryInfo = {
@@ -71,6 +72,9 @@ const LearnPage: React.FC = () => {
                 >
                   Explore Articles
                 </Link>
+                <div className="mt-2 text-xs text-gray-500">
+                  {articlesByCategory[category as ArticleCategory]?.length || 0} articles
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -86,26 +90,71 @@ const LearnPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid gap-4">
-                {/* Placeholder for featured articles - to be integrated with real data */}
-                <article className="p-4 border rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="secondary">Basics</Badge>
-                    <Badge variant="outline" className="text-green-600">
-                      Clinically Verified
-                    </Badge>
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">Understanding Your Menstrual Cycle Phases</h3>
-                  <p className="text-gray-600">
-                    A comprehensive guide to the four phases of your menstrual cycle and what to expect during each one.
-                  </p>
-                  <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
-                    <span>5 min read</span>
-                    <span>Last updated: April 2025</span>
-                  </div>
-                </article>
+                {featuredArticles.map(article => (
+                  <article key={article.id} className="p-4 border rounded-lg hover:shadow-sm transition-shadow">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="secondary">
+                        {categoryInfo[article.category]?.title || 'Article'}
+                      </Badge>
+                      {article.vetted && (
+                        <Badge variant="outline" className="text-green-600 flex items-center gap-1">
+                          <CheckCircle size={10} />
+                          Clinically Verified
+                        </Badge>
+                      )}
+                    </div>
+                    <Link to={`/learn/article/${article.id}`}>
+                      <h3 className="text-lg font-medium mb-2 hover:text-cycle-primary">{article.title}</h3>
+                    </Link>
+                    <p className="text-gray-600">
+                      {article.summary}
+                    </p>
+                    <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
+                      <span className="flex items-center gap-1"><Clock size={14} /> {article.readTime} min read</span>
+                      <span className="flex items-center gap-1"><Calendar size={14} /> Updated: {new Date(article.lastUpdated).toLocaleDateString()}</span>
+                    </div>
+                    <div className="mt-2">
+                      <Link to={`/learn/article/${article.id}`}>
+                        <Button variant="outline" size="sm" className="text-cycle-primary border-cycle-primary hover:bg-cycle-primary hover:text-white">
+                          Read Article
+                        </Button>
+                      </Link>
+                    </div>
+                  </article>
+                ))}
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="mt-8 bg-gray-50 p-6 rounded-lg">
+          <h2 className="text-xl font-semibold mb-4">Our Content Standards</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-medium text-lg mb-2">Evidence-Based Information</h3>
+              <p className="text-gray-600">
+                All content is based on clinical practice guidelines, systematic reviews, and peer-reviewed research to ensure accuracy and reliability.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-lg mb-2">Clinical Review</h3>
+              <p className="text-gray-600">
+                Articles marked as "Clinically Verified" have been reviewed by healthcare professionals specializing in women's health.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-lg mb-2">Regular Updates</h3>
+              <p className="text-gray-600">
+                We review our content at least annually to ensure it reflects the latest medical understanding and guidelines.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium text-lg mb-2">Transparent Sources</h3>
+              <p className="text-gray-600">
+                Every article includes references to its sources, allowing you to verify information and learn more if desired.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
