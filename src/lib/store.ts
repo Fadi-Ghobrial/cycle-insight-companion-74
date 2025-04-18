@@ -1,7 +1,6 @@
-
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { CycleDay, FlowLevel, Mood, Symptom, HealthDataSource, IoTReminder as IoTReminderType, User, Cycle, CyclePrediction } from '@/types';
+import { CycleDay, FlowLevel, Mood, Symptom, HealthDataSource, IoTReminder as IoTReminderType, User, Cycle, CyclePrediction, LifeStage, LifeStageChange } from '@/types';
 import { predictCycle } from './prediction';
 
 // Define the interface for the IoT reminder
@@ -13,6 +12,10 @@ interface AppState {
   // User state
   user: User | null;
   isAuthenticated: boolean;
+  
+  // Life Stage
+  currentLifeStage: LifeStage;
+  lifeStageHistory: LifeStageChange[];
   
   // Cycle data
   cycleDays: CycleDay[];
@@ -30,6 +33,9 @@ interface AppState {
   
   // Cycle management
   recalculatePredictions: () => void;
+  
+  // Life Stage management
+  changeLifeStage: (newStage: LifeStage, reason?: string) => void;
   
   // Health sources management
   connectHealthSource: (source: HealthDataSource) => void;
@@ -56,11 +62,35 @@ const useAppStore = create<AppState>()(
         // Initial state
         user: null,
         isAuthenticated: false,
+        currentLifeStage: LifeStage.STANDARD,
+        lifeStageHistory: [],
         cycleDays: [],
         cycles: [],
         currentCycleId: null,
         healthSources: [],
         reminders: [],
+        
+        // Life Stage management
+        changeLifeStage: (newStage, reason) => set(state => {
+          // Don't change if it's the same
+          if (state.currentLifeStage === newStage) {
+            return state;
+          }
+          
+          const change: LifeStageChange = {
+            id: crypto.randomUUID(),
+            userId: state.user?.id || 'guest',
+            previousStage: state.currentLifeStage,
+            newStage,
+            changedAt: new Date(),
+            reason
+          };
+          
+          return {
+            currentLifeStage: newStage,
+            lifeStageHistory: [...state.lifeStageHistory, change]
+          };
+        }),
         
         // Add a cycle day
         addCycleDay: (day) => set(state => {
@@ -203,7 +233,9 @@ const useAppStore = create<AppState>()(
           healthSources: [], 
           reminders: [],
           cycles: [],
-          currentCycleId: null
+          currentCycleId: null,
+          currentLifeStage: LifeStage.STANDARD,
+          lifeStageHistory: []
         }),
         
         undo: () => {

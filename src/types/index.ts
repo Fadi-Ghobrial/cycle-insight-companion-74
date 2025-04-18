@@ -1,4 +1,3 @@
-
 // User related types
 export interface User {
   id: string;
@@ -6,6 +5,25 @@ export interface User {
   displayName?: string;
   photoUrl?: string;
   createdAt: Date;
+}
+
+// Life Stage types
+export enum LifeStage {
+  FIRST_PERIOD = 'first_period',
+  STANDARD = 'standard',
+  TTC = 'trying_to_conceive',
+  PREGNANCY = 'pregnancy',
+  PERIMENOPAUSE = 'perimenopause',
+  NO_PERIOD = 'no_period'
+}
+
+export interface LifeStageChange {
+  id: string;
+  userId: string;
+  previousStage?: LifeStage;
+  newStage: LifeStage;
+  changedAt: Date;
+  reason?: string;
 }
 
 // Period tracking types
@@ -181,6 +199,7 @@ export interface Article {
   vetted: boolean;
   author: string;
   sources?: string[];
+  lifeStages?: LifeStage[]; // Articles can be targeted to specific life stages
 }
 
 export enum ArticleCategory {
