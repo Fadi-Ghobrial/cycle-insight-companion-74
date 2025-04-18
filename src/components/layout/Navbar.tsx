@@ -2,13 +2,49 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthStatus } from '@/lib/auth-provider';
 import { CalendarIcon, HomeIcon, LineChartIcon, Settings2Icon, BookOpen, Flag } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { LogOut, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
+  const { toast } = useToast();
+  const [user, setUser] = React.useState<any>(null);
   const isMobile = window.innerWidth < 768;
 
   const isActive = (path: string) => {
     return location.pathname === path;
+  };
+
+  React.useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error signing out",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -62,8 +98,28 @@ const Navbar: React.FC = () => {
             </Link>
           </div>
           
-          <div>
-            <AuthStatus />
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <>
+                <span className="text-sm text-gray-600">{user.email}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="flex items-center"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <Button asChild>
+                <Link to="/auth">
+                  <User className="w-4 h-4 mr-2" />
+                  Sign in
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -77,7 +133,24 @@ const Navbar: React.FC = () => {
           </Link>
           
           <div>
-            <AuthStatus />
+            {user ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                className="flex items-center"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign out
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link to="/auth">
+                  <User className="w-4 h-4 mr-2" />
+                  Sign in
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>

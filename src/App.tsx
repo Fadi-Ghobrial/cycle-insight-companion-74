@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,7 @@ import ArticleDetail from "./pages/ArticleDetail";
 import Layout from "./components/layout/Layout";
 import { AppAuthProvider } from "./lib/auth-provider";
 import MilestonesPage from "./pages/Milestones";  // Add this import
+import Auth from "./pages/Auth";
 
 // Initialize store
 import { useAppStore } from "./lib/store";
@@ -34,6 +34,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<Home />} />
             <Route path="/index" element={<Index />} />
             <Route path="/calendar" element={<Calendar />} />
@@ -53,4 +54,3 @@ const App = () => {
 };
 
 export default App;
-
