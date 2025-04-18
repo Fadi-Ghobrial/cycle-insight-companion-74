@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { CycleDay, FlowLevel, Symptom, Mood } from '@/types';
@@ -60,16 +61,20 @@ const DayDetailModal: React.FC<DayDetailModalProps> = ({
     switch (selectedMood) {
       case Mood.HAPPY:
         return 'bg-green-500 text-white border-green-500';
-      case Mood.EXCITED:
+      case Mood.SENSITIVE:
         return 'bg-yellow-500 text-white border-yellow-500';
-      case Mood.CALM:
-        return 'bg-blue-500 text-white border-blue-500';
       case Mood.SAD:
         return 'bg-indigo-500 text-white border-indigo-500';
-      case Mood.STRESSED:
-        return 'bg-red-500 text-white border-red-500';
+      case Mood.ENERGETIC:
+        return 'bg-yellow-400 text-white border-yellow-400';
+      case Mood.TIRED:
+        return 'bg-gray-500 text-white border-gray-500';
       case Mood.ANXIOUS:
         return 'bg-purple-500 text-white border-purple-500';
+      case Mood.IRRITABLE:
+        return 'bg-red-500 text-white border-red-500';
+      case Mood.CALM:
+        return 'bg-blue-500 text-white border-blue-500';
       default:
         return 'bg-gray-100 text-gray-800';
     }
