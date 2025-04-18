@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +16,7 @@ import LearnCategory from "./pages/LearnCategory";
 import ArticleDetail from "./pages/ArticleDetail";
 import Layout from "./components/layout/Layout";
 import { AppAuthProvider } from "./lib/auth-provider";
+import MilestonesPage from "./pages/Milestones";  // Add this import
 
 // Initialize store
 import { useAppStore } from "./lib/store";
@@ -51,3 +53,4 @@ const App = () => {
 };
 
 export default App;
+
