@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Eye, EyeOff } from "lucide-react";
+import { isMobileApp } from "@/lib/platform-health";
 
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
@@ -61,6 +62,11 @@ export default function Auth() {
             {isSignUp
               ? "Create your account to track your cycle"
               : "Welcome back! Please sign in to your account"}
+            {isMobileApp() && (
+              <span className="block mt-2 text-sm text-purple-600">
+                You're using the mobile app version
+              </span>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
