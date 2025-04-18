@@ -6,13 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Book, Brain, Drop, Heart, Leaf, ShieldCheck } from 'lucide-react';
+import { Book, Brain, Heart, Leaf, ShieldCheck, Droplets } from 'lucide-react';
 import { ArticleCategory } from '@/types';
 
 const LearnPage: React.FC = () => {
   const categoryInfo = {
     [ArticleCategory.BASICS]: {
-      icon: Drop,
+      icon: Droplets,
       title: "Menstrual Basics",
       description: "Foundation knowledge about periods and the menstrual cycle",
       color: "text-pink-500"

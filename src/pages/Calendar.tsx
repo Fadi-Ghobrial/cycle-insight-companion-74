@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Calendar as CalendarUI } from '@/components/ui/calendar';
 import { addDays, format, isSameDay, isBefore, isAfter } from 'date-fns';
@@ -18,12 +19,13 @@ const Calendar: React.FC = () => {
       date,
       flow: FlowLevel.MEDIUM,
       symptoms: [],
-      moods: [],
+      moods: [], // Added moods array
       notes: "",
       userId: user?.id || 'guest'
     });
   };
 
+  // Custom renderer for the calendar day cells
   const renderDayContent = (date: Date) => {
     const day: CycleDay | undefined = cycleDays.find(day => isSameDay(new Date(day.date), date));
 
@@ -67,7 +69,9 @@ const Calendar: React.FC = () => {
                 selected={selectedDate}
                 onSelect={(date) => date && setSelectedDate(date)}
                 className="rounded-md border"
-                renderDay={renderDayContent}
+                components={{
+                  DayContent: ({ date }) => renderDayContent(date)
+                }}
               />
               <div className="flex justify-center">
                 <Button onClick={() => handleAddDay(selectedDate)}>Add Data for Selected Date</Button>
