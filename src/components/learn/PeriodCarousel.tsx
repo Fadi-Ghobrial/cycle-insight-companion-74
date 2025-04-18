@@ -27,19 +27,19 @@ const carouselCards: CarouselCard[] = [
     id: 'intro',
     emoji: '🌸',
     title: 'Welcome to Your Period Journey',
-    content: 'Your period is a natural and healthy part of growing up. Let's learn about what to expect and how to take care of yourself during this time.'
+    content: "Your period is a natural and healthy part of growing up. Let's learn about what to expect and how to take care of yourself during this time."
   },
   {
     id: 'cycle',
     emoji: '📅',
     title: 'Understanding Your Cycle',
-    content: 'A menstrual cycle typically lasts 21-35 days. Your period is just one part of this cycle, usually lasting 3-7 days.'
+    content: "A menstrual cycle typically lasts 21-35 days. Your period is just one part of this cycle, usually lasting 3-7 days."
   },
   {
     id: 'products',
     emoji: '🎀',
     title: 'Period Products',
-    content: 'There are many options for managing your period: pads, tampons, and menstrual cups. We'll help you find what works best for you.'
+    content: "There are many options for managing your period: pads, tampons, and menstrual cups. We'll help you find what works best for you."
   }
   // More cards can be added here
 ];
