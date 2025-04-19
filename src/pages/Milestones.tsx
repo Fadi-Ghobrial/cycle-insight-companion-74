@@ -17,6 +17,7 @@ import {
 import { useAppStore } from '@/lib/store';
 import { useToast } from '@/components/ui/use-toast';
 import { LifeStage } from '@/types';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const lifeStageInfo = {
   [LifeStage.FIRST_PERIOD]: {
@@ -233,6 +234,7 @@ const MilestonesPage = () => {
   const { toast } = useToast();
   const [lifecycleTab, setLifecycleTab] = useState<string>(currentLifeStage);
   const [availableFeatures, setAvailableFeatures] = useState(getAvailableFeatures());
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setAvailableFeatures(getAvailableFeatures());
@@ -286,14 +288,20 @@ const MilestonesPage = () => {
           </CardHeader>
           <CardContent>
             <Tabs value={lifecycleTab} onValueChange={handleLifeStageChange} className="w-full">
-              <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full">
-                {Object.entries(lifeStageInfo).map(([stage, info]) => (
-                  <TabsTrigger key={stage} value={stage} className="flex flex-col items-center py-2">
-                    <info.icon size={18} className="mb-1" />
-                    <span className="text-xs">{info.title}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+              <div className="overflow-x-auto pb-2">
+                <TabsList className={`flex ${isMobile ? 'flex-wrap justify-start gap-1 pb-1' : 'grid grid-cols-6'} w-full`}>
+                  {Object.entries(lifeStageInfo).map(([stage, info]) => (
+                    <TabsTrigger 
+                      key={stage} 
+                      value={stage} 
+                      className={`flex flex-col items-center py-2 ${isMobile ? 'min-w-[5.5rem]' : ''}`}
+                    >
+                      <info.icon size={18} className="mb-1" />
+                      <span className="text-xs">{info.title}</span>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
               
               {Object.entries(lifeStageInfo).map(([stage, info]) => (
                 <TabsContent key={stage} value={stage} className="pt-4">
@@ -307,14 +315,12 @@ const MilestonesPage = () => {
                     onSwitch={() => handleLifeStageChange(stage)}
                   />
 
-                  {/* Add Confidence Meter for First Period stage */}
                   {stage === LifeStage.FIRST_PERIOD && currentLifeStage === LifeStage.FIRST_PERIOD && (
                     <div className="mt-4 p-4 border rounded-lg space-y-4">
                       <ConfidenceMeter />
                     </div>
                   )}
 
-                  {/* Feature Status Section */}
                   <div className="mt-4">
                     <h4 className="font-medium mb-3">Features in this mode:</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

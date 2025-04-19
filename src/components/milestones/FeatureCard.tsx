@@ -7,6 +7,7 @@ import { Check, Settings, Lock, Activity, Calendar } from "lucide-react";
 import { LifeStageFeature } from '@/types';
 import { LucideIcon } from 'lucide-react';
 import { ParentGuardianShare } from '@/components/milestones/ParentGuardianShare';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +41,7 @@ export const FeatureCard = ({
   onToggle
 }: FeatureCardProps) => {
   const Icon = feature.icon;
+  const isMobile = useIsMobile();
   
   return (
     <Card className="border-l-4 w-full" style={{ borderLeftColor: borderColor }}>
