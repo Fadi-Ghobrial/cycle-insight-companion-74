@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '@/lib/store';
@@ -9,11 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Baby, Flame, ThermometerSun, AlertCircle } from 'lucide-react';
 import { LifeStage } from '@/types';
+import CalendarLegend from '@/components/calendar/CalendarLegend';
 
 const Home: React.FC = () => {
   const { cycleDays, isAuthenticated, currentLifeStage, lifeStageHistory } = useAppStore();
   
-  // Life stage specific components and content
   const renderLifeStageContent = () => {
     switch(currentLifeStage) {
       case LifeStage.FIRST_PERIOD:
@@ -147,7 +146,6 @@ const Home: React.FC = () => {
         );
         
       default:
-        // Standard mode, don't show any special UI
         return null;
     }
   };
@@ -162,13 +160,13 @@ const Home: React.FC = () => {
           </p>
         </div>
         
-        {/* Life stage specific content */}
         {renderLifeStageContent()}
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold mb-4">Your Cycle Calendar</h2>
             <Calendar />
+            <CalendarLegend />
             <div className="mt-4 flex justify-center">
               <Link 
                 to="/calendar" 

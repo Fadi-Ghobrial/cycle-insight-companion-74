@@ -6,6 +6,7 @@ import { useAppStore } from '@/lib/store';
 import CalendarDayCell from './CalendarDayCell';
 import DayDetailModal from './DayDetailModal';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import CalendarLegend from './CalendarLegend';
 
 interface CalendarProps {
   onDayClick?: (date: Date) => void;
@@ -305,6 +306,7 @@ const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
       {renderHeader()}
       {renderDays()}
       {renderCells()}
+      <CalendarLegend />
       {renderPredictionSummary()}
       
       {showDayDetail && selectedDate && (
