@@ -288,20 +288,18 @@ const MilestonesPage = () => {
           </CardHeader>
           <CardContent>
             <Tabs value={lifecycleTab} onValueChange={handleLifeStageChange} className="w-full">
-              <div className="overflow-x-auto pb-2">
-                <TabsList className="grid grid-cols-3 w-full gap-1">
-                  {Object.entries(lifeStageInfo).map(([stage, info]) => (
-                    <TabsTrigger 
-                      key={stage} 
-                      value={stage} 
-                      className="flex flex-col items-center py-2 min-h-[4rem]"
-                    >
-                      <info.icon size={18} className="mb-1" />
-                      <span className="text-xs text-center">{info.title}</span>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </div>
+              <TabsList className="grid grid-cols-3 grid-rows-2 w-full gap-2 h-auto">
+                {Object.entries(lifeStageInfo).map(([stage, info]) => (
+                  <TabsTrigger 
+                    key={stage} 
+                    value={stage} 
+                    className="flex flex-col items-center py-2 min-h-[4.5rem]"
+                  >
+                    <info.icon size={18} className="mb-1" />
+                    <span className="text-xs text-center">{info.title}</span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
               
               {Object.entries(lifeStageInfo).map(([stage, info]) => (
                 <TabsContent key={stage} value={stage} className="pt-4">
