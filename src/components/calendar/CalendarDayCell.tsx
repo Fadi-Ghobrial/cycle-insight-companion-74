@@ -26,9 +26,9 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
     if (!phase) return null;
     
     const iconProps = {
-      size: 20,
+      size: 32,
       className: cn(
-        "absolute bottom-1 left-1/2 transform -translate-x-1/2",
+        "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-40",
         phase === CyclePhase.MENSTRUAL && "text-phase-menstrual",
         phase === CyclePhase.FOLLICULAR && "text-phase-follicular",
         phase === CyclePhase.OVULATION && "text-phase-ovulation",
@@ -60,14 +60,14 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
       )}
       onClick={onClick}
     >
-      <div className="h-full w-full relative">
+      <div className="h-full w-full relative flex items-center justify-center">
+        {getPhaseIcon()}
         <span className={cn(
-          "text-xs",
+          "text-xs relative z-10",
           isToday && "font-bold text-cycle-primary"
         )}>
           {format(day, 'd')}
         </span>
-        {getPhaseIcon()}
       </div>
     </div>
   );
