@@ -7,6 +7,12 @@ import { Check, Settings, Lock, Activity, Calendar } from "lucide-react";
 import { LifeStageFeature } from '@/types';
 import { LucideIcon } from 'lucide-react';
 import { ParentGuardianShare } from '@/components/milestones/ParentGuardianShare';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 interface FeatureCardProps {
   feature: {
@@ -36,26 +42,30 @@ export const FeatureCard = ({
   const Icon = feature.icon;
   
   return (
-    <Card className="border-l-4" style={{ borderLeftColor: borderColor }}>
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3 mb-2">
-          <Icon className="w-5 h-5" />
-          <div>
-            <h5 className="font-medium">{feature.title}</h5>
-            {feature.safetyFeature && (
-              <span className="text-xs text-yellow-500 flex items-center gap-1 mt-1">
-                <Lock className="w-3 h-3" />
-                {feature.securityInfo}
-              </span>
-            )}
+    <Card className="border-l-4 w-full" style={{ borderLeftColor: borderColor }}>
+      <CardContent className="p-3 md:p-4">
+        <div className="flex flex-col gap-2">
+          {/* Header with icon and title */}
+          <div className="flex items-start gap-2">
+            <Icon className="w-5 h-5 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <h5 className="font-medium text-sm md:text-base line-clamp-1">{feature.title}</h5>
+              {feature.safetyFeature && (
+                <span className="text-xs text-yellow-500 flex items-center gap-1 mt-0.5">
+                  <Lock className="w-3 h-3" />
+                  {feature.securityInfo}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
-        <p className="text-sm text-gray-600 mb-3">{feature.description}</p>
-        
-        <div className="flex flex-col gap-2 mt-2">
+
+          {/* Description */}
+          <p className="text-xs md:text-sm text-gray-600">{feature.description}</p>
+          
+          {/* Status and usage count */}
           <div className="flex justify-between items-center">
-            <span className="text-xs text-gray-500">Status: 
-              <Badge variant="outline" className="ml-2">
+            <span className="text-xs text-gray-500 flex items-center gap-1">
+              <Badge variant="outline" className="h-5">
                 {status === 'completed' ? (
                   <span className="flex items-center text-green-600">
                     <Check className="w-3 h-3 mr-1" /> Ready
@@ -71,14 +81,12 @@ export const FeatureCard = ({
                 )}
               </Badge>
             </span>
-            
-            <span className="text-xs text-gray-500">
-              Used: {usageCount} times
-            </span>
+            <span className="text-xs text-gray-500">Used: {usageCount} times</span>
           </div>
           
+          {/* Actions */}
           {status === 'completed' ? (
-            <div className="flex justify-between gap-2 mt-1">
+            <div className="flex gap-2 mt-1">
               {feature.safetyFeature ? (
                 <ParentGuardianShare />
               ) : (
@@ -86,21 +94,29 @@ export const FeatureCard = ({
                   <Button 
                     size="sm" 
                     variant={enabled ? "default" : "outline"}
-                    className="text-xs w-full"
+                    className="text-xs flex-1"
                     onClick={() => onUse()}
                     disabled={!enabled}
                   >
                     Use Feature
                   </Button>
                   
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-xs"
-                    onClick={() => onToggle(!enabled)}
-                  >
-                    <Settings className="w-3 h-3 mr-1" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="px-2"
+                      >
+                        <Settings className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onToggle(!enabled)}>
+                        {enabled ? 'Disable Feature' : 'Enable Feature'}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </>
               )}
             </div>
