@@ -166,7 +166,6 @@ const Home: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold mb-4">Your Cycle Calendar</h2>
             <Calendar />
-            <CalendarLegend />
             <div className="mt-4 flex justify-center">
               <Link 
                 to="/calendar" 
