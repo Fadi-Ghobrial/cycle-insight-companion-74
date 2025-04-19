@@ -289,15 +289,15 @@ const MilestonesPage = () => {
           <CardContent>
             <Tabs value={lifecycleTab} onValueChange={handleLifeStageChange} className="w-full">
               <div className="overflow-x-auto pb-2">
-                <TabsList className={`flex ${isMobile ? 'flex-wrap justify-start gap-1 pb-1' : 'grid grid-cols-6'} w-full`}>
+                <TabsList className="grid grid-cols-3 w-full gap-1">
                   {Object.entries(lifeStageInfo).map(([stage, info]) => (
                     <TabsTrigger 
                       key={stage} 
                       value={stage} 
-                      className={`flex flex-col items-center py-2 ${isMobile ? 'min-w-[5.5rem]' : ''}`}
+                      className="flex flex-col items-center py-2 min-h-[4rem]"
                     >
                       <info.icon size={18} className="mb-1" />
-                      <span className="text-xs">{info.title}</span>
+                      <span className="text-xs text-center">{info.title}</span>
                     </TabsTrigger>
                   ))}
                 </TabsList>
