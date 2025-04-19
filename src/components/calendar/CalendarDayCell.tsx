@@ -56,6 +56,7 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         "aspect-square p-1 border border-gray-100 relative overflow-hidden",
         !isCurrentMonth && "text-gray-300",
         isToday && "border-cycle-primary",
+        cycleDay && "bg-[#F2FCE2]/40", // Add transparent green background for days with data
         "hover:bg-gray-50 transition-colors cursor-pointer"
       )}
       onClick={onClick}
@@ -74,3 +75,4 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
 };
 
 export default CalendarDayCell;
+
