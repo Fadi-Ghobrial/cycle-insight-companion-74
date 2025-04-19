@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { CycleDay, CyclePhase, FlowLevel } from '@/types';
@@ -56,7 +55,7 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         "aspect-square p-1 border border-gray-100 relative overflow-hidden",
         !isCurrentMonth && "text-gray-300",
         isToday && "border-cycle-primary",
-        cycleDay && "bg-[#F2FCE2]/40", // Add transparent green background for days with data
+        cycleDay && "bg-[#b2ff36]/40",
         "hover:bg-gray-50 transition-colors cursor-pointer"
       )}
       onClick={onClick}
@@ -75,4 +74,3 @@ const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
 };
 
 export default CalendarDayCell;
-
