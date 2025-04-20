@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Bell, Calendar, BellRing, BellOff, Clock, CalendarArrowDown } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
-import { IoTReminder } from '@/types';
 import { format, addDays } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -10,9 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
+import { scheduleReminder } from '@/services/notificationService';
 
 const PeriodReminderSettings: React.FC = () => {
-  const { reminders, addReminder, updateReminder, deleteReminder, cycles, currentCycleId } = useAppStore();
+  const { reminders, updateReminder, deleteReminder, cycles, currentCycleId } = useAppStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   
   const currentCycle = cycles.find(cycle => cycle.id === currentCycleId);
@@ -53,33 +53,33 @@ const PeriodReminderSettings: React.FC = () => {
     const nextPeriodStart = new Date(predictions.nextPeriodStart);
     
     // 2 days before period
-    addReminder({
+    scheduleReminder({
       title: "Period Starting Soon",
       message: `Your period is expected to start in 2 days (${format(nextPeriodStart, 'MMM dd')})`,
       triggerTime: addDays(nextPeriodStart, -2),
       type: "period",
       isRead: false,
-      isActive: notificationsEnabled
+      isActive: true
     });
     
     // day of period
-    addReminder({
+    scheduleReminder({
       title: "Period Starting Today",
       message: `Your period is expected to start today (${format(nextPeriodStart, 'MMM dd')})`,
       triggerTime: nextPeriodStart,
       type: "period",
       isRead: false,
-      isActive: notificationsEnabled
+      isActive: true
     });
     
     // PMS phase beginning (7 days before)
-    addReminder({
+    scheduleReminder({
       title: "PMS Phase Beginning",
       message: "Your PMS phase is expected to begin today",
       triggerTime: addDays(nextPeriodStart, -7),
       type: "period",
       isRead: false,
-      isActive: notificationsEnabled
+      isActive: true
     });
     
     toast({

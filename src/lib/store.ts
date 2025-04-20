@@ -12,6 +12,11 @@ import { addDays } from 'date-fns';
 // Define the interface for the IoT reminder
 export interface IoTReminder extends Omit<IoTReminderType, 'triggerTime'> {
   triggerTime: Date;
+  title: string;
+  message: string;
+  isRead: boolean;
+  isActive: boolean;
+  type: string;
 }
 
 // Life stage features data

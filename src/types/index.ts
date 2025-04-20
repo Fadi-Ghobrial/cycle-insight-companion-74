@@ -1,4 +1,3 @@
-
 // User related types
 export interface User {
   id: string;
@@ -153,13 +152,16 @@ export interface HealthData {
 // IoT and smart home types
 export interface IoTReminder {
   id: string;
-  type: string; // e.g., 'smart_mirror', 'smart_light', etc.
+  type: string; // e.g., 'smart_mirror', 'smart_light', 'period', etc.
+  title: string; // Add title field
   message: string;
   triggerTime: Date;
   repeat: boolean;
   repeatInterval?: 'daily' | 'weekly' | 'monthly' | 'cycle_start' | 'fertile_window';
   userId: string;
   enabled: boolean;
+  isRead: boolean;  // Add isRead field
+  isActive: boolean; // Add isActive field
 }
 
 export interface LocalHealthEvent {

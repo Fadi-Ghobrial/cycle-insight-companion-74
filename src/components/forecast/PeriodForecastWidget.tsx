@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Symptom, CyclePhase } from '@/types';
+import { scheduleReminder } from '@/services/notificationService';
 
 interface PeriodForecastWidgetProps {
   compact?: boolean;
@@ -18,7 +19,7 @@ const PeriodForecastWidget: React.FC<PeriodForecastWidgetProps> = ({
   compact = false,
   showReminders = true
 }) => {
-  const { cycles, currentCycleId, addReminder } = useAppStore();
+  const { cycles, currentCycleId } = useAppStore();
   
   const currentCycle = cycles.find(cycle => cycle.id === currentCycleId);
   const predictions = currentCycle?.predictions;
@@ -64,7 +65,7 @@ const PeriodForecastWidget: React.FC<PeriodForecastWidgetProps> = ({
     const reminderDate = new Date(nextPeriodStart);
     reminderDate.setDate(reminderDate.getDate() - 2);
     
-    addReminder({
+    scheduleReminder({
       title: "Period Starting Soon",
       message: `Your period is expected to start in 2 days (${format(nextPeriodStart, 'MMM dd')})`,
       triggerTime: reminderDate,

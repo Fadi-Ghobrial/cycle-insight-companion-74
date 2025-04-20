@@ -96,9 +96,14 @@ export const checkReminders = (): void => {
 /**
  * Schedule a period reminder
  */
-export const scheduleReminder = (reminder: Omit<IoTReminder, 'id'>): void => {
+export const scheduleReminder = (reminder: Omit<IoTReminder, 'id' | 'userId' | 'repeat' | 'repeatInterval' | 'enabled'>): void => {
   const { addReminder } = useAppStore.getState();
-  addReminder(reminder);
+  addReminder({
+    ...reminder,
+    repeat: false,
+    repeatInterval: undefined,
+    enabled: true
+  });
   
   // Request permission if needed
   if (checkNotificationPermission() && Notification.permission === 'default') {
