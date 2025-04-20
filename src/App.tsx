@@ -1,8 +1,10 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import Home from "./pages/Home";
 import Track from "./pages/Track";
 import Calendar from "./pages/Calendar";
@@ -13,10 +15,9 @@ import Index from "./pages/Index";
 import Learn from "./pages/Learn";
 import LearnCategory from "./pages/LearnCategory";
 import ArticleDetail from "./pages/ArticleDetail";
-import Layout from "./components/layout/Layout";
-import { AppAuthProvider } from "./lib/auth-provider";
-import MilestonesPage from "./pages/Milestones";  // Add this import
+import MilestonesPage from "./pages/Milestones";
 import Auth from "./pages/Auth";
+import { checkReminders } from "./services/notificationService";
 
 // Initialize store
 import { useAppStore } from "./lib/store";
@@ -26,6 +27,19 @@ const queryClient = new QueryClient();
 const App = () => {
   // Initialize the store (this ensures it's created early)
   useAppStore.getState();
+  
+  // Check for reminders periodically
+  useEffect(() => {
+    // Check for reminders immediately
+    checkReminders();
+    
+    // Then check every minute
+    const intervalId = setInterval(() => {
+      checkReminders();
+    }, 60000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
   
   return (
     <QueryClientProvider client={queryClient}>
