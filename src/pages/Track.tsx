@@ -6,6 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
+import MoodSymptomTrendsChart from '@/components/track/MoodSymptomTrendsChart';
 
 const Track: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -255,6 +256,10 @@ const Track: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+        
+        <div className="mt-10">
+          <MoodSymptomTrendsChart />
         </div>
       </div>
     </Layout>

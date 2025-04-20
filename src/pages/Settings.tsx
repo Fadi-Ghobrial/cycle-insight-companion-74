@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,14 +21,11 @@ import {
   type HealthConnection 
 } from '@/services/healthSync';
 
-// Missing declarations for the IoT functions
 const checkIoTConnectivity = async (deviceType: string): Promise<boolean> => {
-  // Simulate connectivity check
   return new Promise(resolve => setTimeout(() => resolve(true), 1000));
 };
 
 const sendTestNotification = async (deviceType: string, message: string): Promise<boolean> => {
-  // Simulate sending notification
   return new Promise(resolve => setTimeout(() => resolve(true), 1000));
 };
 
@@ -45,7 +41,9 @@ const Settings: React.FC = () => {
     repeat: false,
     enabled: true
   });
-  
+  const [reminderType, setReminderType] = useState<string>('');
+  const [reminderMessage, setReminderMessage] = useState<string>('');
+  const [reminderTime, setReminderTime] = useState<string>('');
   const { 
     healthSources, 
     connectHealthSource, 
@@ -55,7 +53,8 @@ const Settings: React.FC = () => {
     updateReminder,
     deleteReminder,
     reset,
-    undo
+    undo,
+    user
   } = useAppStore();
   const [healthConnections, setHealthConnections] = useState<HealthConnection[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -78,7 +77,6 @@ const Settings: React.FC = () => {
     }
   };
   
-  // Connect to health platforms
   const handleHealthConnect = async (platform: 'apple_health' | 'samsung_health') => {
     setIsConnectingHealth(true);
     
@@ -109,7 +107,6 @@ const Settings: React.FC = () => {
     }
   };
   
-  // Disconnect from health platforms
   const handleHealthDisconnect = async (sourceId: string) => {
     try {
       await disconnectHealthApp(sourceId);
@@ -127,7 +124,6 @@ const Settings: React.FC = () => {
     }
   };
 
-  // Sync health data
   const handleSyncData = async (connection: HealthConnection) => {
     setIsSyncing(true);
     try {
@@ -162,7 +158,6 @@ const Settings: React.FC = () => {
     }
   };
   
-  // Add a new IoT reminder
   const handleAddReminder = () => {
     const [hours, minutes] = reminderInput.time.split(':').map(Number);
     const triggerTime = new Date();
@@ -170,15 +165,15 @@ const Settings: React.FC = () => {
     
     addReminder({
       type: reminderInput.type,
-      title: reminderInput.message, // Add title property
+      title: reminderInput.message,
       message: reminderInput.message,
       triggerTime,
       repeat: reminderInput.repeat,
       repeatInterval: 'daily',
       enabled: reminderInput.enabled,
       userId: 'test-user',
-      isRead: false, // Add isRead property
-      isActive: true // Add isActive property
+      isRead: false,
+      isActive: true
     });
     
     toast({
@@ -195,13 +190,11 @@ const Settings: React.FC = () => {
       enabled: true
     });
   };
-  
-  // Toggle reminder enabled state
+
   const toggleReminderEnabled = (reminder: IoTReminder) => {
     updateReminder(reminder.id, { enabled: !reminder.enabled });
   };
-  
-  // Test IoT connectivity and send a test notification
+
   const testIoTConnectivity = async (reminderType: string) => {
     try {
       const isConnected = await checkIoTConnectivity(reminderType);
@@ -236,7 +229,42 @@ const Settings: React.FC = () => {
       });
     }
   };
-  
+
+  const handleCustomReminderAdd = () => {
+    if (!reminderType || !reminderMessage || !reminderTime) {
+      toast({
+        title: 'Error',
+        description: 'Please fill out all fields for the custom reminder.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    const triggerDate = new Date();
+    const [h, m] = reminderTime.split(':').map(Number);
+    triggerDate.setHours(h);
+    triggerDate.setMinutes(m);
+    triggerDate.setSeconds(0);
+    addReminder({
+      type: reminderType,
+      title: reminderMessage,
+      message: reminderMessage,
+      triggerTime: triggerDate,
+      repeat: true,
+      repeatInterval: 'daily',
+      enabled: true,
+      userId: user?.id || 'guest',
+      isRead: false,
+      isActive: true,
+    });
+    setReminderType('');
+    setReminderMessage('');
+    setReminderTime('');
+    toast({
+      title: 'Reminder Created',
+      description: 'Your custom reminder has been set!',
+    });
+  };
+
   return (
     <Layout>
       <div className="container mx-auto py-6 px-4">
@@ -249,7 +277,6 @@ const Settings: React.FC = () => {
             <TabsTrigger value="reminders">Reminders</TabsTrigger>
           </TabsList>
           
-          {/* Account Tab */}
           <TabsContent value="account" className="space-y-6">
             <Card>
               <CardHeader>
@@ -320,7 +347,6 @@ const Settings: React.FC = () => {
             </Card>
           </TabsContent>
           
-          {/* Health Connections Tab */}
           <TabsContent value="health" className="space-y-6">
             <Card>
               <CardHeader>
@@ -412,7 +438,6 @@ const Settings: React.FC = () => {
             </Card>
           </TabsContent>
           
-          {/* Reminders Tab */}
           <TabsContent value="reminders" className="space-y-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -499,9 +524,61 @@ const Settings: React.FC = () => {
             </Card>
           </TabsContent>
         </Tabs>
+        
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Custom Reminders</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
+              <Input
+                placeholder="Reminder type (e.g. medication, hydration)"
+                value={reminderType}
+                onChange={e => setReminderType(e.target.value)}
+              />
+              <Input
+                placeholder="Reminder message"
+                value={reminderMessage}
+                onChange={e => setReminderMessage(e.target.value)}
+              />
+              <Input
+                type="time"
+                placeholder="Time"
+                value={reminderTime}
+                onChange={e => setReminderTime(e.target.value)}
+              />
+            </div>
+            <Button onClick={handleCustomReminderAdd} className="w-full md:w-auto mt-2">
+              Add Custom Reminder
+            </Button>
+            <div className="mt-4">
+              <h3 className="font-medium mb-2">Your Custom Reminders:</h3>
+              <ul>
+                {reminders
+                  .filter(r => r.userId === (user?.id || 'guest') && !['period','fertile_window'].includes(r.type))
+                  .map(r => (
+                    <li
+                      key={r.id}
+                      className="text-sm rounded px-3 py-2 bg-gray-100 mb-1 flex items-center justify-between"
+                    >
+                      <span>
+                        <b>{r.type}</b>: {r.title} @ {new Date(r.triggerTime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+                      </span>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => useAppStore.getState().deleteReminder(r.id)}
+                      >
+                        Delete
+                      </Button>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
       </div>
       
-      {/* Add Reminder Dialog */}
       <Dialog open={isAddReminderOpen} onOpenChange={setIsAddReminderOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
