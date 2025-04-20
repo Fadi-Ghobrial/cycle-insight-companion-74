@@ -157,7 +157,7 @@ const Navbar: React.FC = () => {
 
       {/* Mobile bottom navigation */}
       <div className="fixed md:hidden bottom-0 left-0 right-0 bg-white shadow-[0_-1px_3px_rgba(0,0,0,0.1)] z-50">
-        <div className="grid grid-cols-6 py-2">
+        <div className="grid grid-cols-7 py-2">
           <Link 
             to="/" 
             className={`flex flex-col items-center justify-center ${isActive('/') ? 'text-cycle-primary' : 'text-gray-500'}`}
@@ -208,6 +208,14 @@ const Navbar: React.FC = () => {
           >
             <BookOpen size={20} />
             <span className="text-xs mt-1">Learn</span>
+          </Link>
+
+          <Link 
+            to="/settings" 
+            className={`flex flex-col items-center justify-center ${isActive('/settings') ? 'text-cycle-primary' : 'text-gray-500'}`}
+          >
+            <Settings2Icon size={20} />
+            <span className="text-xs mt-1">Settings</span>
           </Link>
         </div>
       </div>
