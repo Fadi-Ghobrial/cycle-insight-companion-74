@@ -170,12 +170,15 @@ const Settings: React.FC = () => {
     
     addReminder({
       type: reminderInput.type,
+      title: reminderInput.message, // Add title property
       message: reminderInput.message,
       triggerTime,
       repeat: reminderInput.repeat,
       repeatInterval: 'daily',
       enabled: reminderInput.enabled,
-      userId: 'test-user' // Add userId to fix type error
+      userId: 'test-user',
+      isRead: false, // Add isRead property
+      isActive: true // Add isActive property
     });
     
     toast({

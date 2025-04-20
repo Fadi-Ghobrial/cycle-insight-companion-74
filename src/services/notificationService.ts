@@ -102,7 +102,8 @@ export const scheduleReminder = (reminder: Omit<IoTReminder, 'id' | 'userId' | '
     ...reminder,
     repeat: false,
     repeatInterval: undefined,
-    enabled: true
+    enabled: true,
+    userId: 'user-id' // Add userId property
   });
   
   // Request permission if needed
