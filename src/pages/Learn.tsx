@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -70,7 +71,15 @@ const LearnPage: React.FC = () => {
         {currentLifeStage === LifeStage.FIRST_PERIOD && (
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">Period 101</h2>
-            <PeriodCarousel />
+            <div 
+              className="
+                w-full
+                md:max-w-5xl md:mx-auto 
+                lg:max-w-7xl 
+              "
+            >
+              <PeriodCarousel />
+            </div>
           </div>
         )}
 
@@ -192,3 +201,4 @@ const LearnPage: React.FC = () => {
 };
 
 export default LearnPage;
+
