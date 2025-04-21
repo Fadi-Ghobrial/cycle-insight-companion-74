@@ -55,7 +55,7 @@ export const PreconceptionChecklist: React.FC = () => {
       id: '4',
       category: 'health-screening',
       label: 'Pap smear',
-      description: 'Make sure you're up-to-date on cervical cancer screening.',
+      description: 'Make sure you\'re up-to-date on cervical cancer screening.',
       recommended: true,
       checked: false,
       targetPartner: 'female'
@@ -187,7 +187,7 @@ export const PreconceptionChecklist: React.FC = () => {
       id: '18',
       category: 'vaccinations',
       label: 'Get Tdap vaccine',
-      description: 'Ensure you're protected against tetanus, diphtheria and pertussis.',
+      description: 'Ensure you\'re protected against tetanus, diphtheria and pertussis.',
       recommended: false,
       checked: false,
       targetPartner: 'all'
