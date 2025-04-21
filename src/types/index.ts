@@ -277,6 +277,8 @@ export interface PregnancyData {
   symptoms: PregnancySymptom[];
   kickCounts?: KickCount[];
   checklistItems: ChecklistItem[];
+  weight?: number;
+  bloodPressure?: string;
 }
 
 export interface KickCount {

@@ -18,6 +18,11 @@ import { useAppStore } from '@/lib/store';
 import { useToast } from '@/components/ui/use-toast';
 import { LifeStage } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { GestationalAgeTracker } from '@/components/pregnancy/GestationalAgeTracker';
+import { SymptomKickCounter } from '@/components/pregnancy/SymptomKickCounter';
+import { PregnancyChecklistHub } from '@/components/pregnancy/PregnancyChecklistHub';
+import { WeightVitalsLog } from '@/components/pregnancy/WeightVitalsLog';
+import { DueDateWidgets } from '@/components/pregnancy/DueDateWidgets';
 
 const lifeStageInfo = {
   [LifeStage.FIRST_PERIOD]: {
