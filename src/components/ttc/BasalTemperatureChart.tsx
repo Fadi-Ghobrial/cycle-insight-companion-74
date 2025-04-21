@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { useAppStore } from '@/lib/store';
@@ -216,6 +215,7 @@ export const BasalTemperatureChart: React.FC = () => {
                     strokeWidth={2}
                     strokeDasharray="3 3"
                     label={{ value: 'Est. Ovulation', fill: '#D946EF', position: 'top' }}
+                    yAxisId="temp"
                   />
                 )}
                 <ReferenceLine 
