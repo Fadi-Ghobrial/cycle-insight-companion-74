@@ -319,6 +319,16 @@ const MilestonesPage = () => {
                     </div>
                   )}
 
+                  {stage === LifeStage.PREGNANCY && currentLifeStage === LifeStage.PREGNANCY && (
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <GestationalAgeTracker />
+                      <SymptomKickCounter />
+                      <PregnancyChecklistHub />
+                      <WeightVitalsLog />
+                      <DueDateWidgets />
+                    </div>
+                  )}
+
                   <div className="mt-4">
                     <h4 className="font-medium mb-3">Features in this mode:</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
