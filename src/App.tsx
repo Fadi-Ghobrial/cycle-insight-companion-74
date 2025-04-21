@@ -17,6 +17,7 @@ import LearnCategory from "./pages/LearnCategory";
 import ArticleDetail from "./pages/ArticleDetail";
 import MilestonesPage from "./pages/Milestones";
 import Auth from "./pages/Auth";
+import TTC from "./pages/TTC";
 import { checkReminders } from "./services/notificationService";
 
 // Initialize store
@@ -58,6 +59,7 @@ const App = () => {
             <Route path="/learn/:category" element={<LearnCategory />} />
             <Route path="/learn/article/:articleId" element={<ArticleDetail />} />
             <Route path="/milestones" element={<MilestonesPage />} />
+            <Route path="/ttc" element={<TTC />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
