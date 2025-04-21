@@ -70,23 +70,23 @@ const TTC: React.FC = () => {
             <TabsTrigger value="checklist">Checklist</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="fertile-window" className="p-4">
+          <TabsContent value="fertile-window" className="p-4 w-full">
             <FertileWindowCountdown />
           </TabsContent>
           
-          <TabsContent value="ovulation-test" className="p-4">
+          <TabsContent value="ovulation-test" className="p-4 w-full">
             <OvulationTestScanner />
           </TabsContent>
           
-          <TabsContent value="temperature" className="p-4">
+          <TabsContent value="temperature" className="p-4 w-full">
             <BasalTemperatureChart />
           </TabsContent>
           
-          <TabsContent value="sperm-quality" className="p-4">
+          <TabsContent value="sperm-quality" className="p-4 w-full">
             <SpermQualityTips />
           </TabsContent>
           
-          <TabsContent value="checklist" className="p-4">
+          <TabsContent value="checklist" className="p-4 w-full">
             <PreconceptionChecklist />
           </TabsContent>
         </Tabs>
