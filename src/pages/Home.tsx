@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -9,6 +8,11 @@ import { useAppStore } from '@/lib/store';
 import { LifeStage } from '@/types';
 import ForecastSection from '@/components/home/ForecastSection';
 import { TTCRecommendation } from '@/components/home/TTCRecommendation';
+import { GestationalAgeTracker } from '@/components/pregnancy/GestationalAgeTracker';
+import { SymptomKickCounter } from '@/components/pregnancy/SymptomKickCounter';
+import { PregnancyChecklistHub } from '@/components/pregnancy/PregnancyChecklistHub';
+import { WeightVitalsLog } from '@/components/pregnancy/WeightVitalsLog';
+import { DueDateWidgets } from '@/components/pregnancy/DueDateWidgets';
 
 const Home: React.FC = () => {
   const { user, currentLifeStage } = useAppStore();
@@ -25,7 +29,6 @@ const Home: React.FC = () => {
           </p>
         </section>
         
-        {/* Quick Actions */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold mb-3">Quick Actions</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -60,13 +63,25 @@ const Home: React.FC = () => {
           </div>
         </section>
         
-        {/* Forecast Section */}
         <ForecastSection />
         
-        {/* TTC Recommendation - Only visible in TTC life stage */}
         <TTCRecommendation />
-        
-        {/* Life Stage Specific Content */}
+
+        {currentLifeStage === LifeStage.PREGNANCY && (
+          <section className="mb-8">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-lg font-semibold">Pregnancy Tools</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <GestationalAgeTracker />
+              <SymptomKickCounter />
+              <PregnancyChecklistHub />
+              <WeightVitalsLog />
+              <DueDateWidgets />
+            </div>
+          </section>
+        )}
+
         {currentLifeStage === LifeStage.FIRST_PERIOD && (
           <section className="mb-8">
             <div className="flex justify-between items-center mb-3">
@@ -100,8 +115,7 @@ const Home: React.FC = () => {
             </Card>
           </section>
         )}
-        
-        {/* TTC Specific Features - Show direct access to TTC page */}
+
         {currentLifeStage === LifeStage.TTC && (
           <section className="mb-8">
             <div className="flex justify-between items-center mb-3">
@@ -141,8 +155,7 @@ const Home: React.FC = () => {
             </div>
           </section>
         )}
-        
-        {/* Footer Cards - Available to all users */}
+
         <section>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
